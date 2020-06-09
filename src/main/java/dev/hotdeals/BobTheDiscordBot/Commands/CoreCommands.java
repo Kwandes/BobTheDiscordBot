@@ -5,7 +5,6 @@
 
 package dev.hotdeals.BobTheDiscordBot.Commands;
 
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -16,13 +15,14 @@ import org.apache.logging.log4j.Logger;
 
 public class CoreCommands extends ListenerAdapter
 {
-    private static final String commandPrefix = "!";
-    private static final Logger logger = LogManager.getLogger(CoreCommands.class);
+    private static String commandPrefix = "!";
+    private final Logger logger = LogManager.getLogger(CoreCommands.class);
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
     {
-        JDA jda = event.getJDA();
+        if (event.getAuthor().isBot()) return; // don't process messages from bots
+
         Message message = event.getMessage();
 
         if (message.getContentRaw().startsWith(commandPrefix))
@@ -41,5 +41,15 @@ public class CoreCommands extends ListenerAdapter
                         });
             }
         }
+    }
+
+    public static String getCommandPrefix()
+    {
+        return commandPrefix;
+    }
+
+    public static void setCommandPrefix(String prefix)
+    {
+        commandPrefix = prefix;
     }
 }

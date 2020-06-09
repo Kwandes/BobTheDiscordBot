@@ -5,6 +5,7 @@
 package dev.hotdeals.BobTheDiscordBot;
 
 import dev.hotdeals.BobTheDiscordBot.Commands.CoreCommands;
+import dev.hotdeals.BobTheDiscordBot.Config.Config;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -16,15 +17,49 @@ import javax.security.auth.login.LoginException;
 public class BobTheDiscordBot
 {
     private static final Logger logger = LogManager.getLogger(BobTheDiscordBot.class);
+    private static String botToken;
+    private static String displayedAcitivity;
 
     @SuppressWarnings("deprecation") // JDABuilder is deprecated
-    public static void main(String[] args)
+    public static void main(String[] args) throws Exception
     {
+        // setup the config
+        try
+        {
+            Config.loadProperties();
+        } catch (Exception e)
+        {
+            logger.fatal("Failed to initialize the application config. CLosing the application", e);
+            System.exit(40); // 40 - failed to initialize the config
+        }
+
         // Actual discord
         try
         {
-            JDA jda = new JDABuilder("botToken")
-                    .setActivity(Activity.playing("PingPong"))
+            botToken = Config.getProperties().getProperty("botToken");
+
+            if (botToken == null)
+            {
+                logger.fatal("Failed to retrieve the Bot Token from the config. Closing the application");
+                System.exit(41); // 41 - config property is null
+            }
+
+            displayedAcitivity = Config.getProperties().getProperty("displayedActivity");
+            if (displayedAcitivity == null)
+            {
+                logger.warn("Failed to retrieve the 'displayedActivity' property from the config. Setting it to 'Ping Pong'");
+                displayedAcitivity = "Ping Pong";
+            }
+
+            CoreCommands.setCommandPrefix(Config.getProperties().getProperty("commandPrefix"));
+            if (CoreCommands.getCommandPrefix() == null)
+            {
+                logger.warn("Failed to retrieve the 'commandPrefix' property from the config. Setting it to '!'");
+                CoreCommands.setCommandPrefix("!");
+            }
+
+            JDA jda = new JDABuilder(botToken)
+                    .setActivity(Activity.playing(displayedAcitivity))
                     .build();
             jda.awaitReady(); // Blocking guarantees that JDA will be completely loaded.
             logger.info("JDA has finished loading and has successfully logged in");
