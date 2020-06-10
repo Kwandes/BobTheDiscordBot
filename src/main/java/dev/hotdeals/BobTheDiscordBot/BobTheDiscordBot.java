@@ -6,6 +6,8 @@ package dev.hotdeals.BobTheDiscordBot;
 
 import dev.hotdeals.BobTheDiscordBot.Commands.CoreCommands;
 import dev.hotdeals.BobTheDiscordBot.Config.Config;
+import dev.hotdeals.BobTheDiscordBot.Config.JdbcConfig;
+import dev.hotdeals.BobTheDiscordBot.Repository.PrefixRepo;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -13,10 +15,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.security.auth.login.LoginException;
+import java.lang.invoke.MethodHandles;
+import java.sql.SQLException;
 
 public class BobTheDiscordBot
 {
-    private static final Logger logger = LogManager.getLogger(BobTheDiscordBot.class);
+    final static Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass());
     private static String botToken;
     private static String displayedAcitivity;
 
@@ -31,6 +35,15 @@ public class BobTheDiscordBot
         {
             logger.fatal("Failed to initialize the application config. CLosing the application", e);
             System.exit(40); // 40 - failed to initialize the config
+        }
+
+        try
+        {
+            JdbcConfig.loadProperties();
+            logger.debug("Connection to the database has been configured");
+        } catch (SQLException e)
+        {
+            logger.error("Failed to establish connection to the database: " + e);
         }
 
         // Actual discord
@@ -51,12 +64,15 @@ public class BobTheDiscordBot
                 displayedAcitivity = "Ping Pong";
             }
 
-            CoreCommands.setCommandPrefix(Config.getProperties().getProperty("commandPrefix"));
-            if (CoreCommands.getCommandPrefix() == null)
+            // set a default command prefix
+            CoreCommands.setDefaultCommandPrefix(Config.getProperties().getProperty("commandPrefix"));
+            if (CoreCommands.getDefaultCommandPrefix() == null)
             {
                 logger.warn("Failed to retrieve the 'commandPrefix' property from the config. Setting it to '!'");
-                CoreCommands.setCommandPrefix("!");
+                CoreCommands.setDefaultCommandPrefix("!");
             }
+            CoreCommands.setGuildPrefixes(PrefixRepo.fetchPrefixes());
+            logger.debug("Command prefixes have been loaded");
 
             JDA jda = new JDABuilder(botToken)
                     .setActivity(Activity.playing(displayedAcitivity))

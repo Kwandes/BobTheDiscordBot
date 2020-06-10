@@ -1,5 +1,6 @@
 /*
-    Read the config.properties file and handles it
+    Configuration class for the application runtime variables
+    Uses the application.properties file
  */
 
 package dev.hotdeals.BobTheDiscordBot.Config;
@@ -8,13 +9,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.lang.invoke.MethodHandles;
 import java.util.Properties;
 
 public class Config
 {
+    final static Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass());
+
     private static Properties properties;
-    private static final String configFileName = "config.properties";
-    private static final Logger logger = LogManager.getLogger(Config.class);
+    private static final String configFileName = "application.properties";
 
     public static void loadProperties() throws IOException
     {
