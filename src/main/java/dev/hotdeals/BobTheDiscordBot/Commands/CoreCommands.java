@@ -5,7 +5,6 @@
 
 package dev.hotdeals.BobTheDiscordBot.Commands;
 
-import dev.hotdeals.BobTheDiscordBot.Repository.PrefixRepo;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -46,51 +45,11 @@ public class CoreCommands extends ListenerAdapter
                     });
         } else if (message.getContentRaw().startsWith(commandPrefix + "prefix"))
         {
-            handlePrefix(event);
+            AdministrationCommands.handlePrefix(event);
         }
     }
 
     //region command logic
-    private void handlePrefix(MessageReceivedEvent event)
-    {
-        Message message = event.getMessage();
-
-        String[] splitMessage = message.getContentRaw().split(" ");
-
-        if (splitMessage.length == 1)
-        {
-            event.getChannel().sendMessage("The current Prefix is '" + commandPrefix + "'") /* => RestAction<Message> */
-                    .queue();
-            return;
-        }
-
-        if (splitMessage[1].length() > 3)
-        {
-            event.getChannel().sendMessage("New prefix is too long, max characters: 3, provided prefix: " + splitMessage[1].length())
-                    .queue();
-        } else
-        {
-            PrefixRepo.setPrefixForGuild(event.getGuild().getId(), splitMessage[1]);
-
-            guildPrefixes = PrefixRepo.fetchPrefixes(); // refresh the list
-            // check if the list of prefixes has been updated, aka if the query failed or not
-            if (guildPrefixes.get(event.getGuild().getId()) == null || !guildPrefixes.get(event.getGuild().getId()).equals(splitMessage[1]))
-            {
-                logger.warn("Failed to set a new prefix due to DB connection issues");
-                event.getChannel().sendMessage("Failed to set a new prefix due to DB connection issues")
-                        .queue();
-            } else
-            {
-                logger.info(event.getGuild() + " changed prefix from + " + commandPrefix + " to " + splitMessage[1]);
-                commandPrefix = splitMessage[1];
-                event.getChannel().sendMessage("Prefix has been set to " + commandPrefix)
-                        .queue();
-                guildPrefixes = PrefixRepo.fetchPrefixes(); // refresh the list
-
-            }
-        }
-    }
-
     //endregion
 
     //region Getters and Setter
