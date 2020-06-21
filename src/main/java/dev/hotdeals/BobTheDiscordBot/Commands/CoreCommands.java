@@ -35,7 +35,10 @@ public class CoreCommands extends ListenerAdapter
         if (!message.getContentRaw().startsWith(commandPrefix)) return;
 
         logger.debug(event.getGuild() + "/" + event.getChannel() + "/" + event.getAuthor() + " called a command `" + message.getContentRaw() + "`");
-        if (message.getContentRaw().matches("\\A" + commandPrefix + "ping"))
+        if (message.getContentRaw().startsWith(commandPrefix + "tag") || message.getContentRaw().startsWith(commandPrefix + "t"))
+        {
+            Tag.processTagCommand(event);
+        } else if (message.getContentRaw().matches("\\A" + commandPrefix + "ping"))
         {
             long time = System.currentTimeMillis();
             event.getChannel().sendMessage("Pong!") /* => RestAction<Message> */
