@@ -5,6 +5,7 @@
 
 package dev.hotdeals.BobTheDiscordBot.Commands;
 
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -25,6 +26,7 @@ public class CoreCommands extends ListenerAdapter
     public void onMessageReceived(MessageReceivedEvent event)
     {
         if (event.getAuthor().isBot()) return; // don't process messages from bots
+        if (!event.isFromType(ChannelType.TEXT)) return; // don't process messages that are not sent in a text channel (No DMs etc)
 
         Message message = event.getMessage();
 
@@ -32,7 +34,8 @@ public class CoreCommands extends ListenerAdapter
         commandPrefix = guildPrefixes.get(event.getGuild().getId());
         if (commandPrefix == null) commandPrefix = defaultCommandPrefix;
 
-        if (!message.getContentRaw().startsWith(commandPrefix)) return;
+        // don't process messages that don't start with the prefix or don't mention the bot directly
+        if (!(message.getContentRaw().startsWith(commandPrefix) || message.getContentRaw().equals("<@!" + event.getJDA().getSelfUser().getId() + ">"))) return;
 
         logger.debug(event.getGuild() + "/" + event.getChannel() + "/" + event.getAuthor() + " called a command `" + message.getContentRaw() + "`");
         if (message.getContentRaw().startsWith(commandPrefix + "tag") || message.getContentRaw().startsWith(commandPrefix + "t"))
@@ -49,6 +52,9 @@ public class CoreCommands extends ListenerAdapter
         } else if (message.getContentRaw().startsWith(commandPrefix + "prefix"))
         {
             AdministrationCommands.handlePrefix(event);
+        } else if (message.getContentRaw().equals("<@!" + event.getJDA().getSelfUser().getId() + ">") || message.getContentRaw().matches("\\A" + commandPrefix + "help"))
+        {
+            event.getChannel().sendMessage("Help is on its way").queue();
         }
     }
 
