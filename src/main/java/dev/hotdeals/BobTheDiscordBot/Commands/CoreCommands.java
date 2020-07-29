@@ -37,7 +37,7 @@ public class CoreCommands extends ListenerAdapter
         logger.debug(event.getGuild() + "/" + event.getChannel() + "/" + event.getAuthor() + " called a command `" + message.getContentRaw() + "`");
         if (message.getContentRaw().startsWith(commandPrefix + "tag") || message.getContentRaw().startsWith(commandPrefix + "t"))
         {
-            Tag.processTagCommand(event);
+            TagCommands.processTagCommand(event);
         } else if (message.getContentRaw().matches("\\A" + commandPrefix + "ping"))
         {
             long time = System.currentTimeMillis();

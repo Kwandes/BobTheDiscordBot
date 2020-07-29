@@ -1,5 +1,7 @@
 /*
     Handles per-guild messages called 'tags'
+    Tags consist of a name and a message.
+    This class handles retrieval, creation, edition and removal of tags as well as sending them to the guild
  */
 
 package dev.hotdeals.BobTheDiscordBot.Commands;
@@ -13,7 +15,7 @@ import org.apache.logging.log4j.Logger;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 
-public class Tag
+public class TagCommands
 {
     final static Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -43,6 +45,7 @@ public class Tag
         splitMessage[1] = splitMessage[1].toLowerCase();
         if (splitMessage.length > 2) splitMessage[2] = splitMessage[2].toLowerCase();
 
+        // process the tag command depending on the behaviour type (create, edit, remove, list)
         switch (splitMessage[1])
         {
             case "create":
