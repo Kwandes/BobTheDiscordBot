@@ -29,6 +29,7 @@ public class CoreCommands extends ListenerAdapter
     private static String commandPrefix;
     private static HashMap<String, String> guildPrefixes = new HashMap<>();
 
+    // receive new message events and call corresponding methods
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
     {
@@ -50,14 +51,14 @@ public class CoreCommands extends ListenerAdapter
         if (message.getContentRaw().startsWith(commandPrefix + "tag") || message.getContentRaw().startsWith(commandPrefix + "t"))
         {
             TagCommands.processTagCommand(event);
-        } else if (message.getContentRaw().matches("\\A" + commandPrefix + "ping"))
+        } else if (message.getContentRaw().startsWith(commandPrefix + "ping"))
         {
             sendPing(event);
         } else if (message.getContentRaw().startsWith(commandPrefix + "prefix"))
         {
             AdministrationCommands.handlePrefix(event);
         } else if (message.getContentRaw().equals("<@!" + event.getJDA().getSelfUser().getId() + ">") ||
-                message.getContentRaw().matches("\\A" + commandPrefix + "status"))
+                message.getContentRaw().startsWith(commandPrefix + "status"))
         {
             sendStatusMessage(event);
         } else if (message.getContentRaw().startsWith(commandPrefix + "help"))
@@ -112,7 +113,7 @@ public class CoreCommands extends ListenerAdapter
         embed.addField("Uptime", days + "d:" + hours % 24 + "h:" + minutes % 60 + "m:" + seconds % 60 + "s", true);
 
         // set various project information
-        String buildVersion = "0.4.0";
+        String buildVersion = "0.4.1";
         String jdaVersion = "4.1.1_159";
         String javaVersion = "11";
         embed.addField("Build Info", "```fix\nVersion: " + buildVersion + "\nJDA: " + jdaVersion + "\nJava: " + javaVersion + "```", false);
