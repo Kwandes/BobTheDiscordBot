@@ -13,8 +13,13 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.awt.*;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
@@ -113,9 +118,23 @@ public class CoreCommands extends ListenerAdapter
         embed.addField("Uptime", days + "d:" + hours % 24 + "h:" + minutes % 60 + "m:" + seconds % 60 + "s", true);
 
         // set various project information
-        String buildVersion = "0.4.1";
-        String jdaVersion = "4.1.1_159";
-        String javaVersion = "11";
+        String buildVersion = "N/A";
+        String jdaVersion = "N/A";
+        String javaVersion = "N/A";
+
+        // get project information from the maven pom.xml file
+        try (FileReader fr = new FileReader("pom.xml"))
+        {
+            MavenXpp3Reader reader = new MavenXpp3Reader();
+            Model model = reader.read(fr);
+            buildVersion = model.getVersion();
+            jdaVersion = model.getDependencies().get(0).getVersion();
+            javaVersion = model.getProperties().getProperty("maven.compiler.source");
+        } catch (IOException | XmlPullParserException e)
+        {
+            logger.error("An error occurred during parsing of the pom.xml data", e);
+        }
+
         embed.addField("Build Info", "```fix\nVersion: " + buildVersion + "\nJDA: " + jdaVersion + "\nJava: " + javaVersion + "```", false);
         embed.addField("Source", "[github.com/Kwandes](https://github.com/Kwandes/BobTheDiscordBot)", false);
         embed.setFooter("use " + commandPrefix + "help for more information");
