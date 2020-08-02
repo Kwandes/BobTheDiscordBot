@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 public class PrefixRepo
 {
-    final static Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
     public static HashMap<String, String> fetchPrefixes()
     {
@@ -33,10 +33,10 @@ public class PrefixRepo
 
         } catch (SQLException e)
         {
-            logger.error("An error occurred while performing a query", e);
+            LOGGER.error("An error occurred while performing a query", e);
         } catch (NullPointerException e)
         {
-            logger.error("Database connection is null, probably due to invalid configuration");
+            LOGGER.error("Database connection is null, probably due to invalid configuration");
         }
         // if the response contained no entries, return an empty hashmap
         return new HashMap<String, String>();
@@ -55,10 +55,10 @@ public class PrefixRepo
             statement.executeUpdate();
         } catch (SQLException e)
         {
-            logger.error("An error occurred while performing a query", e);
+            LOGGER.error("An error occurred while performing a query", e);
         } catch (NullPointerException e)
         {
-            logger.error("Database connection is null, probably due to invalid configuration");
+            LOGGER.error("Database connection is null, probably due to invalid configuration");
         }
     }
 }

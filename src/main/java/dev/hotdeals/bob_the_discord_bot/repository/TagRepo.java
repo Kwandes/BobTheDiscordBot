@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 public class TagRepo
 {
-    final static Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
     public static HashMap<String, String> fetchTagsForGuild(String guildId)
     {
@@ -32,10 +32,10 @@ public class TagRepo
 
         } catch (SQLException e)
         {
-            logger.error("An error occurred while performing a query", e);
+            LOGGER.error("An error occurred while performing a query", e);
         } catch (NullPointerException e)
         {
-            logger.error("Database connection is null, probably due to invalid configuration");
+            LOGGER.error("Database connection is null, probably due to invalid configuration");
         }
         // if the response contained no entries, return an empty hashmap
         return new HashMap<String, String>();
@@ -53,10 +53,10 @@ public class TagRepo
             return statement.executeUpdate() > 0;
         } catch (SQLException e)
         {
-            logger.error("An error occurred while performing a query", e);
+            LOGGER.error("An error occurred while performing a query", e);
         } catch (NullPointerException e)
         {
-            logger.error("Database connection is null, probably due to invalid configuration");
+            LOGGER.error("Database connection is null, probably due to invalid configuration");
         }
         return false;
     }
@@ -75,10 +75,10 @@ public class TagRepo
 
         } catch (SQLException e)
         {
-            logger.error("An error occurred while performing a query", e);
+            LOGGER.error("An error occurred while performing a query", e);
         } catch (NullPointerException e)
         {
-            logger.error("Database connection is null, probably due to invalid configuration");
+            LOGGER.error("Database connection is null, probably due to invalid configuration");
         }
         return false;
     }
@@ -94,10 +94,10 @@ public class TagRepo
             return statement.executeUpdate() > 0;
         } catch (SQLException e)
         {
-            logger.error("An error occurred while performing a query", e);
+            LOGGER.error("An error occurred while performing a query", e);
         } catch (NullPointerException e)
         {
-            logger.error("Database connection is null, probably due to invalid configuration");
+            LOGGER.error("Database connection is null, probably due to invalid configuration");
         }
         return false;
     }

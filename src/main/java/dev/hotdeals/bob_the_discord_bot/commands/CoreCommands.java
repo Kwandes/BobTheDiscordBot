@@ -29,7 +29,7 @@ import java.util.HashMap;
 
 public class CoreCommands extends ListenerAdapter
 {
-    final static Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LogManager.getLogger(MethodHandles.lookup().lookupClass());
     private static String defaultCommandPrefix;
     private static String commandPrefix;
     private static HashMap<String, String> guildPrefixes = new HashMap<>();
@@ -52,7 +52,7 @@ public class CoreCommands extends ListenerAdapter
         if (!(message.getContentRaw().startsWith(commandPrefix) || message.getContentRaw().equals("<@!" + event.getJDA().getSelfUser().getId() + ">")))
             return;
 
-        logger.debug(event.getGuild() + "/" + event.getChannel() + "/" + event.getAuthor() + " called a command `" + message.getContentRaw() + "`");
+        LOGGER.debug(event.getGuild() + "/" + event.getChannel() + "/" + event.getAuthor() + " called a command `" + message.getContentRaw() + "`");
 
         // find out what the first word is. It is used to decide what command/behaviour to trigger
         String command;
@@ -151,7 +151,7 @@ public class CoreCommands extends ListenerAdapter
             javaVersion = model.getProperties().getProperty("maven.compiler.source");
         } catch (IOException | XmlPullParserException e)
         {
-            logger.error("An error occurred during parsing of the pom.xml data", e);
+            LOGGER.error("An error occurred during parsing of the pom.xml data", e);
         }
 
         embed.addField("Build Info", "```fix\nVersion: " + buildVersion + "\nJDA: " + jdaVersion + "\nJava: " + javaVersion + "```", false);
@@ -232,7 +232,7 @@ public class CoreCommands extends ListenerAdapter
             {
                 // very unlikely unless a human error happens in the validation code
                 // critical if it does get through
-                logger.error("An invalid method has been looked up during Command Annotation search", e);
+                LOGGER.error("An invalid method has been looked up during Command Annotation search", e);
             }
         }
         return matchingCommands;

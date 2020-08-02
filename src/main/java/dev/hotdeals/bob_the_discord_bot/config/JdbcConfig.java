@@ -18,7 +18,7 @@ import java.util.Properties;
 
 public class JdbcConfig
 {
-    final static Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
     private static Properties properties;
     private static final String configFileName = "jdbcConnection.properties";
@@ -31,9 +31,9 @@ public class JdbcConfig
         properties = new Properties();
         FileInputStream fi = new FileInputStream("src/main/resources/" + configFileName);
         properties.load(fi);
-        logger.trace("The config.properties file has been loaded");
+        LOGGER.trace("The config.properties file has been loaded");
         setConnection();
-        logger.trace("The JDBC connection has been loaded");
+        LOGGER.trace("The JDBC connection has been loaded");
     }
 
     public static void setConnection() throws SQLException
