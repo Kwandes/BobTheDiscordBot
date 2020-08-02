@@ -3,7 +3,7 @@
     Uses the jdbcConnection.properties file
  */
 
-package dev.hotdeals.BobTheDiscordBot.Config;
+package dev.hotdeals.bob_the_discord_bot.config;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

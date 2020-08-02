@@ -3,7 +3,7 @@
     Only handles mapping of the commands
  */
 
-package dev.hotdeals.BobTheDiscordBot.Commands;
+package dev.hotdeals.bob_the_discord_bot.commands;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;

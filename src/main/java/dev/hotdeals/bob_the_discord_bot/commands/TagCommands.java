@@ -4,9 +4,9 @@
     This class handles retrieval, creation, edition and removal of tags as well as sending them to the guild
  */
 
-package dev.hotdeals.BobTheDiscordBot.Commands;
+package dev.hotdeals.bob_the_discord_bot.commands;
 
-import dev.hotdeals.BobTheDiscordBot.Repository.TagRepo;
+import dev.hotdeals.bob_the_discord_bot.repository.TagRepo;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.apache.logging.log4j.LogManager;

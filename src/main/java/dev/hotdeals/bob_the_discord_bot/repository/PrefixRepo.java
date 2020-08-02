@@ -3,9 +3,9 @@
     This class handles the calls regarding the command prefix
  */
 
-package dev.hotdeals.BobTheDiscordBot.Repository;
+package dev.hotdeals.bob_the_discord_bot.repository;
 
-import dev.hotdeals.BobTheDiscordBot.Config.JdbcConfig;
+import dev.hotdeals.bob_the_discord_bot.config.JdbcConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

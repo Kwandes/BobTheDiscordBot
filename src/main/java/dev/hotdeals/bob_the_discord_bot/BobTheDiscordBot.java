@@ -2,12 +2,12 @@
     Main class for the project
  */
 
-package dev.hotdeals.BobTheDiscordBot;
+package dev.hotdeals.bob_the_discord_bot;
 
-import dev.hotdeals.BobTheDiscordBot.Commands.CoreCommands;
-import dev.hotdeals.BobTheDiscordBot.Config.Config;
-import dev.hotdeals.BobTheDiscordBot.Config.JdbcConfig;
-import dev.hotdeals.BobTheDiscordBot.Repository.PrefixRepo;
+import dev.hotdeals.bob_the_discord_bot.commands.CoreCommands;
+import dev.hotdeals.bob_the_discord_bot.config.Config;
+import dev.hotdeals.bob_the_discord_bot.config.JdbcConfig;
+import dev.hotdeals.bob_the_discord_bot.repository.PrefixRepo;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;

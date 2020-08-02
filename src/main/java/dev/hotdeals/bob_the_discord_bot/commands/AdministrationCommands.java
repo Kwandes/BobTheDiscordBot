@@ -1,6 +1,6 @@
-package dev.hotdeals.BobTheDiscordBot.Commands;
+package dev.hotdeals.bob_the_discord_bot.commands;
 
-import dev.hotdeals.BobTheDiscordBot.Repository.PrefixRepo;
+import dev.hotdeals.bob_the_discord_bot.repository.PrefixRepo;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.apache.logging.log4j.LogManager;
