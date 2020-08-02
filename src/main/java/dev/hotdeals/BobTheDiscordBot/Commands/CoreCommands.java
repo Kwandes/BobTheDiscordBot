@@ -53,30 +53,49 @@ public class CoreCommands extends ListenerAdapter
             return;
 
         logger.debug(event.getGuild() + "/" + event.getChannel() + "/" + event.getAuthor() + " called a command `" + message.getContentRaw() + "`");
-        if (message.getContentRaw().startsWith(commandPrefix + "tag") || message.getContentRaw().startsWith(commandPrefix + "t"))
-        {
-            TagCommands.processTagCommand(event);
-        } else if (message.getContentRaw().startsWith(commandPrefix + "ping"))
-        {
-            sendPing(event);
-        } else if (message.getContentRaw().startsWith(commandPrefix + "prefix"))
-        {
-            AdministrationCommands.handlePrefix(event);
-        } else if (message.getContentRaw().equals("<@!" + event.getJDA().getSelfUser().getId() + ">") ||
-                message.getContentRaw().startsWith(commandPrefix + "status"))
-        {
-            sendStatusMessage(event);
-        } else if (message.getContentRaw().startsWith(commandPrefix + "help"))
-        {
 
-            String[] splitMessage = message.getContentRaw().split(" ");
-            if (splitMessage.length == 1)
-            {
-                sendEmptyHelpMessage(event);
-            } else if (splitMessage.length >= 2)
-            {
-                sendHelpMessage(event, splitMessage[1]);
-            }
+        // find out what the first word is. It is used to decide what command/behaviour to trigger
+        String command;
+        String firstWord = message.getContentRaw().toLowerCase().split(" ")[0];
+
+        if (firstWord.startsWith(commandPrefix))
+            command = firstWord.substring(commandPrefix.length()); // return the first word without the prefix
+        else
+            command = "";
+
+        // if the message simply mentions the bot, set the command to trigger !status
+        if (message.getContentRaw().equals("<@!" + event.getJDA().getSelfUser().getId() + ">"))
+            command = ("status");
+
+        switch (command)
+        {
+            case "tag":
+            case "t":
+                TagCommands.processTagCommand(event);
+                break;
+            case "ping":
+                sendPing(event);
+                break;
+            case "prefix":
+                AdministrationCommands.handlePrefix(event);
+                break;
+            case "status":
+                sendStatusMessage(event);
+                break;
+            case "help":
+                String[] splitMessage = message.getContentRaw().toLowerCase().split(" ");
+                if (splitMessage.length == 1)
+                {
+                    sendEmptyHelpMessage(event);
+                } else if (splitMessage.length >= 2)
+                {
+                    sendHelpMessage(event, splitMessage[1]);
+                }
+                break;
+            case "":
+            default:
+                // do nothing, such command doesn't exist / is invalid
+
         }
     }
 
