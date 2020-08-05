@@ -24,7 +24,6 @@ public class BobTheDiscordBot
     private static String botToken;
     private static String displayedAcitivity;
 
-    @SuppressWarnings("deprecation") // JDABuilder is deprecated
     public static void main(String[] args) throws Exception
     {
         // setup the config
@@ -74,7 +73,7 @@ public class BobTheDiscordBot
             CoreCommands.setGuildPrefixes(PrefixRepo.fetchPrefixes());
             LOGGER.debug("Command prefixes have been loaded");
 
-            JDA jda = new JDABuilder(botToken)
+            JDA jda = JDABuilder.createDefault(botToken)
                     .setActivity(Activity.playing(displayedAcitivity))
                     .build();
             jda.awaitReady(); // Blocking guarantees that JDA will be completely loaded.
