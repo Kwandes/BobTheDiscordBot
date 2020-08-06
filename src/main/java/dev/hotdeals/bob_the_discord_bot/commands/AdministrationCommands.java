@@ -1,7 +1,6 @@
 package dev.hotdeals.bob_the_discord_bot.commands;
 
 import dev.hotdeals.bob_the_discord_bot.repository.PrefixRepo;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,12 +14,8 @@ public class AdministrationCommands
     @Command(name = "prefix", description = "Displays current bot prefix", structure = "prefix")
     public static void handlePrefix(MessageReceivedEvent event)
     {
-        Message message = event.getMessage();
-
-        String commandPrefix = CoreCommands.getGuildPrefixes().get(event.getGuild().getId());
-        if (commandPrefix == null) commandPrefix = CoreCommands.getDefaultCommandPrefix();
-
-        String[] splitMessage = message.getContentRaw().split(" ");
+        String commandPrefix = CoreCommands.findGuildCommandPrefix(event.getGuild().getId());
+        String[] splitMessage =  event.getMessage().getContentRaw().split(" ");
 
         if (splitMessage.length == 1)
         {
@@ -46,7 +41,8 @@ public class AdministrationCommands
 
         CoreCommands.setGuildPrefixes(PrefixRepo.fetchPrefixes()); // refresh the list
         // check if the list of prefixes has been updated, aka if the query failed or not
-        if (CoreCommands.getGuildPrefixes().get(event.getGuild().getId()) == null || !CoreCommands.getGuildPrefixes().get(event.getGuild().getId()).equals(splitMessage[1]))
+        if (CoreCommands.getGuildPrefixes().get(event.getGuild().getId()) == null ||
+                !CoreCommands.getGuildPrefixes().get(event.getGuild().getId()).equals(splitMessage[1]))
         {
             LOGGER.warn("Failed to set a new prefix due to DB connection issues");
             event.getChannel().sendMessage("Failed to set a new prefix due to DB connection issues")

@@ -38,7 +38,6 @@ public class JdbcConfig
 
     public static void setConnection() throws SQLException
     {
-
         connection = DriverManager.getConnection(properties.getProperty("jdbcUrl"),
                 properties.getProperty("jdbcUsername"), properties.getProperty("jdbcPassword"));
     }

@@ -23,7 +23,7 @@ public class TagRepo
             statement.setString(1, guildId);
             ResultSet rs = statement.executeQuery();
 
-            HashMap<String, String> result = new HashMap<String, String>();
+            HashMap<String, String> result = new HashMap<>();
             while (rs.next())
             {
                 result.put(rs.getString("tag_name"), rs.getString("tag_content"));
@@ -38,7 +38,7 @@ public class TagRepo
             LOGGER.error("Database connection is null, probably due to invalid configuration");
         }
         // if the response contained no entries, return an empty hashmap
-        return new HashMap<String, String>();
+        return new HashMap<>();
     }
 
     public static boolean createTag(String guildId, String tagName, String tagContent)

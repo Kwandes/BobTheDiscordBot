@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.io.FileReader;
@@ -36,36 +37,17 @@ public class CoreCommands extends ListenerAdapter
 
     // receive new message events and call corresponding methods
     @Override
-    public void onMessageReceived(MessageReceivedEvent event)
+    public void onMessageReceived(@NotNull MessageReceivedEvent event)
     {
-        if (event.getAuthor().isBot()) return; // don't process messages from bots
-        if (!event.isFromType(ChannelType.TEXT))
-            return; // don't process messages that are not sent in a text channel (No DMs etc)
+        if (event.getAuthor().isBot()) return;
 
-        Message message = event.getMessage();
+        commandPrefix = findGuildCommandPrefix(event.getGuild().getId());
+        if (validateMessage(event)) return;
 
-        // get guild-specific prefix
-        commandPrefix = guildPrefixes.get(event.getGuild().getId());
-        if (commandPrefix == null) commandPrefix = defaultCommandPrefix;
+        LOGGER.debug(event.getGuild() + "/" + event.getChannel() + "/" + event.getAuthor() +
+                " called a command `" + event.getMessage().getContentRaw() + "`");
 
-        // don't process messages that don't start with the prefix or don't mention the bot directly
-        if (!(message.getContentRaw().startsWith(commandPrefix) || message.getContentRaw().equals("<@!" + event.getJDA().getSelfUser().getId() + ">")))
-            return;
-
-        LOGGER.debug(event.getGuild() + "/" + event.getChannel() + "/" + event.getAuthor() + " called a command `" + message.getContentRaw() + "`");
-
-        // find out what the first word is. It is used to decide what command/behaviour to trigger
-        String command;
-        String firstWord = message.getContentRaw().toLowerCase().split(" ")[0];
-
-        if (firstWord.startsWith(commandPrefix))
-            command = firstWord.substring(commandPrefix.length()); // return the first word without the prefix
-        else
-            command = "";
-
-        // if the message simply mentions the bot, set the command to trigger !status
-        if (message.getContentRaw().equals("<@!" + event.getJDA().getSelfUser().getId() + ">"))
-            command = ("status");
+        String command = getFirstArgument(event.getMessage().getContentRaw(), event.getJDA().getSelfUser().getId());
 
         switch (command)
         {
@@ -83,7 +65,7 @@ public class CoreCommands extends ListenerAdapter
                 sendStatusMessage(event);
                 break;
             case "help":
-                String[] splitMessage = message.getContentRaw().toLowerCase().split(" ");
+                String[] splitMessage = event.getMessage().getContentRaw().toLowerCase().split(" ");
                 if (splitMessage.length == 1)
                 {
                     sendEmptyHelpMessage(event);
@@ -95,9 +77,45 @@ public class CoreCommands extends ListenerAdapter
             case "":
             default:
                 // do nothing, such command doesn't exist / is invalid
-
         }
     }
+
+    //region Message processing
+    private boolean validateMessage(MessageReceivedEvent event)
+    {
+        if (event.getAuthor().isBot()) return false;
+        Message message = event.getMessage();
+
+        return (checkMessageType(message.getContentRaw(), event.getJDA().getSelfUser().getId(), message.getChannelType()));
+    }
+
+    public static String findGuildCommandPrefix(String guildID)
+    {
+        String prefix = guildPrefixes.get(guildID);
+        if (prefix == null) prefix = defaultCommandPrefix;
+        return prefix;
+    }
+
+    private boolean checkMessageType(String message, String botId, ChannelType channelType)
+    {
+        if (channelType != ChannelType.TEXT) return false;
+        return (!(message.startsWith(commandPrefix) || message.equals("<@!" + botId + ">")));
+    }
+
+    private String getFirstArgument(String message, String botId)
+    {
+        String firstArg = message.toLowerCase().split(" ")[0];
+        String command = "";
+
+        if (firstArg.startsWith(commandPrefix))
+            command = firstArg.substring(commandPrefix.length());
+        // if the message simply mentions the bot, set the command to trigger !status
+        if (firstArg.equals("<@!" + botId + ">"))
+            command = "status";
+
+        return command;
+    }
+    //endregion
 
     //region command logic
 

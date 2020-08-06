@@ -21,11 +21,11 @@ public class TagCommands
 
     public static void processTagCommand(MessageReceivedEvent event)
     {
-        String commandPrefix = CoreCommands.getGuildPrefixes().get(event.getGuild().getId());
-        if (commandPrefix == null) commandPrefix = CoreCommands.getDefaultCommandPrefix();
+        String commandPrefix = CoreCommands.findGuildCommandPrefix(event.getGuild().getId());
 
         Message message = event.getMessage();
-        String[] splitMessage = message.getContentRaw().split(" ");
+
+        String[] splitMessage = convertCommandArguments(message.getContentRaw());
 
         if (splitMessage.length < 2)
         {
@@ -34,16 +34,6 @@ public class TagCommands
                     .queue();
             return;
         }
-
-        // combine the remainder, if it exists
-        for (int i = 0; i < splitMessage.length; i++)
-        {
-            if (i > 3) splitMessage[3] += " " + splitMessage[i];
-        }
-
-        // convert the command and the tag name to lower case
-        splitMessage[1] = splitMessage[1].toLowerCase();
-        if (splitMessage.length > 2) splitMessage[2] = splitMessage[2].toLowerCase();
 
         // process the tag command depending on the behaviour type (display, create, edit, remove, list)
         switch (splitMessage[1])
@@ -66,7 +56,7 @@ public class TagCommands
     }
 
     @Command(name = "tag create", description = "Creates a tag", structure = "tag create <trigger> <response>")
-    public static void tagCreate(MessageReceivedEvent event, String[] splitMessage, String commandPrefix)
+    private static void tagCreate(MessageReceivedEvent event, String[] splitMessage, String commandPrefix)
     {
         if (splitMessage.length < 4)
         {
@@ -111,7 +101,7 @@ public class TagCommands
     }
 
     @Command(name = "tag edit", description = "Edit a tag", structure = "tag edit <trigger> <response>")
-    public static void tagEdit(MessageReceivedEvent event, String[] splitMessage, String commandPrefix)
+    private static void tagEdit(MessageReceivedEvent event, String[] splitMessage, String commandPrefix)
     {
         if (splitMessage.length < 4)
         {
@@ -157,7 +147,7 @@ public class TagCommands
     }
 
     @Command(name = "tag remove", description = "Remove a tag", structure = "tag remove <trigger>")
-    public static void tagRemove(MessageReceivedEvent event, String[] splitMessage, String commandPrefix)
+    private static void tagRemove(MessageReceivedEvent event, String[] splitMessage, String commandPrefix)
     {
         if (splitMessage.length < 3)
         {
@@ -189,7 +179,7 @@ public class TagCommands
     }
 
     @Command(name = "tag list", description = "Displays a list of existing tags", structure = "tag list")
-    public static void tagList(MessageReceivedEvent event)
+    private static void tagList(MessageReceivedEvent event)
     {
         String tags = "";
         for (String tag : TagRepo.fetchTagsForGuild(event.getGuild().getId()).keySet())
@@ -225,5 +215,21 @@ public class TagCommands
             event.getChannel().sendMessage(
                     "A tag with the name `" + splitMessage[1] + "` doesn't exists!").queue();
         }
+    }
+
+    private static String[] convertCommandArguments(String message)
+    {
+        String[] splitMessage = message.split(" ");
+
+        if (splitMessage.length > 1) splitMessage[1] = splitMessage[1].toLowerCase();
+        if (splitMessage.length > 2) splitMessage[2] = splitMessage[2].toLowerCase();
+
+        // combine the remainder, if it exists
+        for (int i = 0; i < splitMessage.length; i++)
+        {
+            if (i > 3) splitMessage[3] += " " + splitMessage[i];
+        }
+
+        return splitMessage;
     }
 }

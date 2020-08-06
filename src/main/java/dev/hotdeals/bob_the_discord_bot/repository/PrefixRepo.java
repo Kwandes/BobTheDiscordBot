@@ -24,7 +24,7 @@ public class PrefixRepo
             PreparedStatement statement = JdbcConfig.getConnection().prepareStatement("SELECT guild_id, prefix FROM prefix");
             ResultSet rs = statement.executeQuery();
 
-            HashMap<String, String> result = new HashMap<String, String>();
+            HashMap<String, String> result = new HashMap<>();
             while (rs.next())       // extract the prefix from the resultSet
             {
                 result.put(rs.getString("guild_id"), rs.getString("prefix"));
@@ -39,7 +39,7 @@ public class PrefixRepo
             LOGGER.error("Database connection is null, probably due to invalid configuration");
         }
         // if the response contained no entries, return an empty hashmap
-        return new HashMap<String, String>();
+        return new HashMap<>();
     }
 
     public static void setPrefixForGuild(String guildId, String newPrefix)
