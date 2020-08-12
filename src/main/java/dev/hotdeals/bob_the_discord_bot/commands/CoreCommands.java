@@ -5,6 +5,7 @@
 
 package dev.hotdeals.bob_the_discord_bot.commands;
 
+import dev.hotdeals.bob_the_discord_bot.repository.StatusRepo;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
@@ -142,9 +143,16 @@ public class CoreCommands extends ListenerAdapter
         embed.setDescription("A Discord bot made in Java for learning purposes");
         embed.addField("Prefix", commandPrefix, true);
 
-        long responseTime = System.currentTimeMillis(); // used for calculating latency
+        long dbResponseTime = System.currentTimeMillis(); // used for calculating latency
+        String dbLatency  = "N/A";
+        if (StatusRepo.getConnectionStatus())
+        {
+            dbLatency = System.currentTimeMillis() - dbResponseTime + "ms";
+        }
+        long responseTime = System.currentTimeMillis();
         embed.addField("Ping", "Heartbeat: " + event.getJDA().getGatewayPing() + "ms" +
-                "\n Response Time: " + (System.currentTimeMillis() - responseTime) + "ms", true);
+                "\n Response Time: " + (System.currentTimeMillis() - responseTime) + "ms" +
+                "\n Database Connection: " + dbLatency, true);
 
         // get current Uptime and add it to the embed
         long uptime = ManagementFactory.getRuntimeMXBean().getUptime(); // VM uptime, in milliseconds
@@ -176,11 +184,13 @@ public class CoreCommands extends ListenerAdapter
         embed.addField("Source", "[github.com/Kwandes](https://github.com/Kwandes/BobTheDiscordBot)", false);
         embed.setFooter("use " + commandPrefix + "help for more information");
 
+        String finalDbLatency = dbLatency; // variables used in a lambda expression have to be effectively final
         event.getChannel().sendMessage(embed.build()).queue(response /* => Message */ ->
         {
             // update the embed with response time
             embed.getFields().set(1, new MessageEmbed.Field("Ping", "Heartbeat: " + event.getJDA().getGatewayPing() + "ms" +
-                    "\n Response Time: " + (System.currentTimeMillis() - responseTime) + "ms", true));
+                    "\n Response Time: " + (System.currentTimeMillis() - responseTime) + "ms" +
+                    "\n Database Connection: " + finalDbLatency, true));
             response.editMessage(embed.build()).queue();
         });
     }
