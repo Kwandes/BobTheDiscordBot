@@ -17,11 +17,13 @@ import org.apache.logging.log4j.Logger;
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.sql.SQLException;
 
 public class BobTheDiscordBot
 {
     private static final Logger LOGGER = LogManager.getLogger(MethodHandles.lookup().lookupClass());
+
+    private static Config config = null;
+    private static JdbcConfig jdbcConfig = null;
 
     public static void main(String[] args)
     {
@@ -29,7 +31,7 @@ public class BobTheDiscordBot
 
         try
         {
-            String botToken = Config.getProperties().getProperty("botToken");
+            String botToken = config.getProperties().getProperty("botToken");
 
             if (botToken == null)
             {
@@ -37,14 +39,14 @@ public class BobTheDiscordBot
                 System.exit(41); // 41 - config property is null
             }
 
-            String displayedActivity = Config.getProperties().getProperty("displayedActivity");
+            String displayedActivity = config.getProperties().getProperty("displayedActivity");
             if (displayedActivity == null)
             {
                 LOGGER.warn("Failed to retrieve the 'displayedActivity' property from the config. Setting it to 'Ping Pong'");
                 displayedActivity = "Ping Pong";
             }
 
-            CoreCommands.setDefaultCommandPrefix(Config.getProperties().getProperty("commandPrefix"));
+            CoreCommands.setDefaultCommandPrefix(config.getProperties().getProperty("commandPrefix"));
             if (CoreCommands.getDefaultCommandPrefix() == null)
             {
                 LOGGER.warn("Failed to retrieve the 'commandPrefix' property from the config. Setting it to '!'");
@@ -78,22 +80,34 @@ public class BobTheDiscordBot
 
     private static void setupConfig()
     {
+        config = Config.getInstance();
         try
         {
-            Config.loadProperties();
+            config.loadProperties();
         } catch (Exception e)
         {
             LOGGER.fatal("Failed to initialize the application config. CLosing the application", e);
             System.exit(40); // 40 - failed to initialize the config
         }
 
+        jdbcConfig = JdbcConfig.getInstance();
         try
         {
-            JdbcConfig.loadProperties();
+            jdbcConfig.loadProperties();
             LOGGER.debug("Connection to the database has been configured");
-        } catch (SQLException | IOException e)
+        } catch (IOException e)
         {
-            LOGGER.error("Failed to establish connection to the database: " + e);
+            LOGGER.error("Database connection properties have failed to load: " + e);
         }
+    }
+
+    public static Config getConfig()
+    {
+        return config;
+    }
+
+    public static JdbcConfig getJdbcConfig()
+    {
+        return jdbcConfig;
     }
 }

@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.invoke.MethodHandles;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,9 +17,9 @@ public class TagRepo
 
     public static HashMap<String, String> fetchTagsForGuild(String guildId)
     {
-        try
+        try (Connection connection = JdbcConfig.getInstance().getConnection())
         {
-            PreparedStatement statement = JdbcConfig.getConnection().prepareStatement(
+            PreparedStatement statement = connection.prepareStatement(
                     "SELECT tag_name, tag_content FROM tag WHERE guild_id = ?");
             statement.setString(1, guildId);
             ResultSet rs = statement.executeQuery();
@@ -43,9 +44,9 @@ public class TagRepo
 
     public static boolean createTag(String guildId, String tagName, String tagContent)
     {
-        try
+        try (Connection connection = JdbcConfig.getInstance().getConnection())
         {
-            PreparedStatement statement = JdbcConfig.getConnection().prepareStatement(
+            PreparedStatement statement = connection.prepareStatement(
                     "INSERT INTO tag (guild_id, tag_name, tag_content) VALUES (?, ?, ?)");
             statement.setString(1, guildId);
             statement.setString(2, tagName);
@@ -63,9 +64,9 @@ public class TagRepo
 
     public static boolean updateTag(String guildId, String tagName, String tagContent)
     {
-        try
+        try (Connection connection = JdbcConfig.getInstance().getConnection())
         {
-            PreparedStatement statement = JdbcConfig.getConnection().prepareStatement(
+            PreparedStatement statement = connection.prepareStatement(
                     "UPDATE tag SET tag_name = ?, tag_content = ? WHERE guild_id = ? AND tag_name = ?");
             statement.setString(1, tagName);
             statement.setString(2, tagContent);
@@ -85,9 +86,9 @@ public class TagRepo
 
     public static boolean deleteTag(String guildId, String tagName)
     {
-        try
+        try (Connection connection = JdbcConfig.getInstance().getConnection())
         {
-            PreparedStatement statement = JdbcConfig.getConnection().prepareStatement(
+            PreparedStatement statement = connection.prepareStatement(
                     "DELETE FROM tag WHERE guild_id = ? AND tag_name = ?");
             statement.setString(1, guildId);
             statement.setString(2, tagName);

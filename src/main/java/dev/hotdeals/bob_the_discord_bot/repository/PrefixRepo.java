@@ -19,9 +19,9 @@ public class PrefixRepo
 
     public static HashMap<String, String> fetchPrefixes()
     {
-        try
+        try (Connection connection = JdbcConfig.getInstance().getConnection())
         {
-            PreparedStatement statement = JdbcConfig.getConnection().prepareStatement("SELECT guild_id, prefix FROM prefix");
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, prefix FROM prefix");
             ResultSet rs = statement.executeQuery();
 
             HashMap<String, String> result = new HashMap<>();
@@ -44,11 +44,10 @@ public class PrefixRepo
 
     public static void setPrefixForGuild(String guildId, String newPrefix)
     {
-        try
+        try (Connection connection = JdbcConfig.getInstance().getConnection())
         {
-            PreparedStatement statement = JdbcConfig.getConnection()
-                    .prepareStatement("INSERT INTO prefix (guild_id, prefix) VALUES (?, ?)" +
-                            " ON DUPLICATE KEY UPDATE prefix = ?");
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO prefix (guild_id, prefix) VALUES (?, ?)" +
+                    " ON DUPLICATE KEY UPDATE prefix = ?");
             statement.setString(1, guildId);
             statement.setString(2, newPrefix);
             statement.setString(3, newPrefix);

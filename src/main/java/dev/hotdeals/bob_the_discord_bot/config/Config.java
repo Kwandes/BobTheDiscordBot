@@ -16,10 +16,24 @@ public class Config
 {
     private static final Logger LOGGER = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static Properties properties;
-    private static final String configFileName = "application.properties";
+    private static Config instance = null;
 
-    public static void loadProperties() throws IOException
+    private Config()
+    {
+        LOGGER.debug("A config instance has been created");
+    }
+
+    public static Config getInstance()
+    {
+        if (instance == null)
+            instance = new Config();
+        return instance;
+    }
+
+    private Properties properties;
+    private final String configFileName = "application.properties";
+
+    public void loadProperties() throws IOException
     {
         properties = new Properties();
         FileInputStream fi = new FileInputStream("src/main/resources/" + configFileName);
@@ -31,14 +45,14 @@ public class Config
     }
 
     // the properties file cannot process the env variables so the config holds names of the env vars instead
-    private static void setEnvVariables() throws NullPointerException
+    private void setEnvVariables() throws NullPointerException
     {
         LOGGER.debug("Processing the bot token env variable");
-        properties.setProperty("botToken", System.getenv(Config.getProperties().getProperty("botToken")));
+        this.properties.setProperty("botToken", System.getenv(getProperties().getProperty("botToken")));
     }
 
-    public static Properties getProperties()
+    public Properties getProperties()
     {
-        return properties;
+        return this.properties;
     }
 }

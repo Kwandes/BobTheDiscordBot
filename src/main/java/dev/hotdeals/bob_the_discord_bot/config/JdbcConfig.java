@@ -20,30 +20,34 @@ public class JdbcConfig
 {
     private static final Logger LOGGER = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static Properties properties;
-    private static final String configFileName = "jdbcConnection.properties";
+    private static JdbcConfig instance = null;
 
-    private static Connection connection;
+    private JdbcConfig()
+    {
+        LOGGER.debug("A config instance has been created");
+    }
 
+    public static JdbcConfig getInstance()
+    {
+        if (instance == null)
+            instance = new JdbcConfig();
+        return instance;
+    }
 
-    public static void loadProperties() throws IOException, SQLException
+    private Properties properties;
+    private final String configFileName = "jdbcConnection.properties";
+
+    public void loadProperties() throws IOException
     {
         properties = new Properties();
         FileInputStream fi = new FileInputStream("src/main/resources/" + configFileName);
         properties.load(fi);
         LOGGER.trace("The config.properties file has been loaded");
-        setConnection();
-        LOGGER.trace("The JDBC connection has been loaded");
     }
 
-    public static void setConnection() throws SQLException
+    public Connection getConnection() throws SQLException
     {
-        connection = DriverManager.getConnection(properties.getProperty("jdbcUrl"),
-                properties.getProperty("jdbcUsername"), properties.getProperty("jdbcPassword"));
-    }
-
-    public static Connection getConnection()
-    {
-        return connection;
+        return DriverManager.getConnection(properties.getProperty("jdbcUrl"),
+                this.properties.getProperty("jdbcUsername"), properties.getProperty("jdbcPassword"));
     }
 }
