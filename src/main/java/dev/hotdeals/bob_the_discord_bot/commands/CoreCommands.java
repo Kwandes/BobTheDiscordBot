@@ -8,7 +8,6 @@ package dev.hotdeals.bob_the_discord_bot.commands;
 import dev.hotdeals.bob_the_discord_bot.repository.StatusRepo;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -33,22 +32,19 @@ public class CoreCommands extends ListenerAdapter
 {
     private static final Logger LOGGER = LogManager.getLogger(MethodHandles.lookup().lookupClass());
     private static String defaultCommandPrefix;
-    private static String commandPrefix;
     private static HashMap<String, String> guildPrefixes = new HashMap<>();
 
     // receive new message events and call corresponding methods
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event)
     {
-        if (event.getAuthor().isBot()) return;
-
-        commandPrefix = findGuildCommandPrefix(event.getGuild().getId());
-        if (validateMessage(event)) return;
+        String commandPrefix = findGuildCommandPrefix(event.getGuild().getId());
+        if (!validateMessage(event, commandPrefix)) return;
 
         LOGGER.debug(event.getGuild() + "/" + event.getChannel() + "/" + event.getAuthor() +
                 " called a command `" + event.getMessage().getContentRaw() + "`");
 
-        String command = getFirstArgument(event.getMessage().getContentRaw(), event.getJDA().getSelfUser().getId());
+        String command = getFirstArgument(event.getMessage().getContentRaw(), commandPrefix, event.getJDA().getSelfUser().getId());
 
         switch (command)
         {
@@ -63,16 +59,16 @@ public class CoreCommands extends ListenerAdapter
                 AdministrationCommands.handlePrefix(event);
                 break;
             case "status":
-                sendStatusMessage(event);
+                sendStatusMessage(event, commandPrefix);
                 break;
             case "help":
                 String[] splitMessage = event.getMessage().getContentRaw().toLowerCase().split(" ");
                 if (splitMessage.length == 1)
                 {
-                    sendEmptyHelpMessage(event);
+                    sendEmptyHelpMessage(event, commandPrefix);
                 } else if (splitMessage.length >= 2)
                 {
-                    sendHelpMessage(event, splitMessage[1]);
+                    sendHelpMessage(event, command, splitMessage[1]);
                 }
                 break;
             case "":
@@ -82,12 +78,11 @@ public class CoreCommands extends ListenerAdapter
     }
 
     //region Message processing
-    private boolean validateMessage(MessageReceivedEvent event)
+    public boolean validateMessage(MessageReceivedEvent event, String commandPrefix)
     {
         if (event.getAuthor().isBot()) return false;
-        Message message = event.getMessage();
-
-        return (checkMessageType(message.getContentRaw(), event.getJDA().getSelfUser().getId(), message.getChannelType()));
+        return (checkMessageType(event.getMessage().getContentRaw(), commandPrefix,
+                event.getJDA().getSelfUser().getId(), event.getMessage().getChannelType()));
     }
 
     public static String findGuildCommandPrefix(String guildID)
@@ -97,13 +92,13 @@ public class CoreCommands extends ListenerAdapter
         return prefix;
     }
 
-    private boolean checkMessageType(String message, String botId, ChannelType channelType)
+    public boolean checkMessageType(String message, String commandPrefix, String botId, ChannelType channelType)
     {
         if (channelType != ChannelType.TEXT) return false;
-        return (!(message.startsWith(commandPrefix) || message.equals("<@!" + botId + ">")));
+        return (message.startsWith(commandPrefix) || message.equals("<@!" + botId + ">"));
     }
 
-    private String getFirstArgument(String message, String botId)
+    public String getFirstArgument(String message, String commandPrefix, String botId)
     {
         String firstArg = message.toLowerCase().split(" ")[0];
         String command = "";
@@ -133,7 +128,7 @@ public class CoreCommands extends ListenerAdapter
 
     // send an embed containing information regarding the bot
     @Command(name = "status", description = "Displays information about the bot", structure = "status")
-    private void sendStatusMessage(MessageReceivedEvent event)
+    private void sendStatusMessage(MessageReceivedEvent event, String commandPrefix)
     {
         EmbedBuilder embed = new EmbedBuilder();
 
@@ -144,7 +139,7 @@ public class CoreCommands extends ListenerAdapter
         embed.addField("Prefix", commandPrefix, true);
 
         long dbResponseTime = System.currentTimeMillis(); // used for calculating latency
-        String dbLatency  = "N/A";
+        String dbLatency = "N/A";
         if (StatusRepo.getConnectionStatus())
         {
             dbLatency = System.currentTimeMillis() - dbResponseTime + "ms";
@@ -196,7 +191,7 @@ public class CoreCommands extends ListenerAdapter
     }
 
     //region help command
-    private void sendEmptyHelpMessage(MessageReceivedEvent event)
+    private void sendEmptyHelpMessage(MessageReceivedEvent event, String commandPrefix)
     {
         EmbedBuilder embed = new EmbedBuilder();
 
@@ -208,7 +203,7 @@ public class CoreCommands extends ListenerAdapter
     }
 
     @Command(name = "help", description = "Displays information about a specific command", structure = "help <command>")
-    private void sendHelpMessage(MessageReceivedEvent event, String commandName)
+    private void sendHelpMessage(MessageReceivedEvent event, String commandName, String commandPrefix)
     {
         EmbedBuilder embed = new EmbedBuilder();
 
