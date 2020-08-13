@@ -68,7 +68,7 @@ public class CoreCommands extends ListenerAdapter
                     sendEmptyHelpMessage(event, commandPrefix);
                 } else if (splitMessage.length >= 2)
                 {
-                    sendHelpMessage(event, command, splitMessage[1]);
+                    sendHelpMessage(event, splitMessage[1], commandPrefix);
                 }
                 break;
             case "":
