@@ -15,7 +15,7 @@ public class AdministrationCommands
     public static void handlePrefix(MessageReceivedEvent event)
     {
         String commandPrefix = CoreCommands.findGuildCommandPrefix(event.getGuild().getId());
-        String[] splitMessage =  event.getMessage().getContentRaw().split(" ");
+        String[] splitMessage = event.getMessage().getContentRaw().split(" ");
 
         if (splitMessage.length == 1)
         {

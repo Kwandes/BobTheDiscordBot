@@ -30,7 +30,7 @@ public class Config
         return instance;
     }
 
-    private Properties properties;
+    private Properties properties = null;
     private final String configFileName = "application.properties";
 
     public void loadProperties() throws IOException

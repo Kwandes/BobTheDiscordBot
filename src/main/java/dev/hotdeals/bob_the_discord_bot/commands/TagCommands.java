@@ -217,7 +217,7 @@ public class TagCommands
         }
     }
 
-    private static String[] convertCommandArguments(String message)
+    public static String[] convertCommandArguments(String message)
     {
         String[] splitMessage = message.split(" ");
 
