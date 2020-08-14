@@ -8,6 +8,10 @@
 Technologies Used
 -
 - Java 11
+- JDA
+- SLF4j
+- JDBC
+- JUnit
 - Maven
 - Git
 - IntelliJ (Development Environment)
