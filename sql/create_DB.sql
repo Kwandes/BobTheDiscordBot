@@ -27,13 +27,23 @@ CREATE TABLE IF NOT EXISTS discord.prefix (
     CONSTRAINT uc_guild_id UNIQUE (guild_id)
 );
 
+-- Contains reminders sent to the users at a specified time
+CREATE TABLE IF NOT EXISTS discord.reminder (
+    id       INT AUTO_INCREMENT NOT NULL,
+    user_id  TEXT,
+    datetime VARCHAR(32),
+    reminder TEXT,
+    status   VARCHAR(8),
+    CONSTRAINT ph_reminder PRIMARY KEY (id)
+);
+
 -- Contains changes done to the tables in this schema. Used by the triggers
 CREATE TABLE IF NOT EXISTS discord.log (
-    id INT AUTO_INCREMENT NOT NULL ,
+    id         INT AUTO_INCREMENT NOT NULL,
     user_id    TEXT,
     action     VARCHAR(10),
     table_name VARCHAR(15),
     log_time   DATETIME(6),
     data       TEXT,
     CONSTRAINT ph_log PRIMARY KEY (id)
-)
+);

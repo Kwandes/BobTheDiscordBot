@@ -5,6 +5,7 @@
 package dev.hotdeals.bob_the_discord_bot;
 
 import dev.hotdeals.bob_the_discord_bot.commands.CoreCommands;
+import dev.hotdeals.bob_the_discord_bot.commands.ReminderCommand;
 import dev.hotdeals.bob_the_discord_bot.config.Config;
 import dev.hotdeals.bob_the_discord_bot.config.JdbcConfig;
 import dev.hotdeals.bob_the_discord_bot.repository.PrefixRepo;
@@ -24,6 +25,7 @@ public class BobTheDiscordBot
 
     private static Config config = null;
     private static JdbcConfig jdbcConfig = null;
+    private static JDA jda = null;
 
     public static void main(String[] args)
     {
@@ -55,7 +57,9 @@ public class BobTheDiscordBot
             CoreCommands.setGuildPrefixes(PrefixRepo.fetchPrefixes());
             LOGGER.debug("Command prefixes have been loaded");
 
-            JDA jda = JDABuilder.createDefault(botToken)
+            ReminderCommand.checkReminders();
+
+            jda = JDABuilder.createDefault(botToken)
                     .setActivity(Activity.playing(displayedActivity))
                     .build();
             jda.awaitReady(); // Blocking guarantees that JDA will be completely loaded.
@@ -110,4 +114,10 @@ public class BobTheDiscordBot
     {
         return jdbcConfig;
     }
+
+    public static JDA getJda()
+    {
+        return jda;
+    }
+
 }

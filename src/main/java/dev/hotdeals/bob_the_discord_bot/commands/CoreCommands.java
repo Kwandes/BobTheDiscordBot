@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ public class CoreCommands extends ListenerAdapter
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event)
     {
+        if (event.getAuthor().isBot()) return;
         String commandPrefix = findGuildCommandPrefix(event.getGuild().getId());
         if (!validateMessage(event, commandPrefix)) return;
 
@@ -45,7 +47,7 @@ public class CoreCommands extends ListenerAdapter
                 " called a command `" + event.getMessage().getContentRaw() + "`");
 
         String command = getFirstArgument(event.getMessage().getContentRaw(), commandPrefix, event.getJDA().getSelfUser().getId());
-
+        String[] splitMessage = null;
         switch (command)
         {
             case "tag":
@@ -62,7 +64,7 @@ public class CoreCommands extends ListenerAdapter
                 sendStatusMessage(event, commandPrefix);
                 break;
             case "help":
-                String[] splitMessage = event.getMessage().getContentRaw().toLowerCase().split(" ");
+                splitMessage = event.getMessage().getContentRaw().toLowerCase().split(" ");
                 if (splitMessage.length == 1)
                 {
                     sendEmptyHelpMessage(event, commandPrefix);
@@ -71,6 +73,10 @@ public class CoreCommands extends ListenerAdapter
                     sendHelpMessage(event, splitMessage[1], commandPrefix);
                 }
                 break;
+            case "remindme":
+            case "remind":
+            case "reminder":
+                ReminderCommand.processReminderCommand(event);
             case "":
             default:
                 // do nothing, such command doesn't exist / is invalid
@@ -234,10 +240,12 @@ public class CoreCommands extends ListenerAdapter
         Class<? extends CoreCommands> coreCommands = CoreCommands.class;
         Class<? extends TagCommands> tagCommands = TagCommands.class;
         Class<? extends AdministrationCommands> adminCommands = AdministrationCommands.class;
+        Class<? extends ReminderCommand> reminderCommand = ReminderCommand.class;
 
         methods.addAll(Arrays.asList(coreCommands.getDeclaredMethods()));
         methods.addAll(Arrays.asList(tagCommands.getDeclaredMethods()));
         methods.addAll(Arrays.asList(adminCommands.getDeclaredMethods()));
+        methods.addAll(Arrays.asList(reminderCommand.getDeclaredMethods()));
 
         // iterate through the methods and filter for matching commands
         ArrayList<Command> matchingCommands = new ArrayList<>();
