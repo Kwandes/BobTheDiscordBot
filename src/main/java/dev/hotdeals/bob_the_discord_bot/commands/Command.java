@@ -15,6 +15,8 @@ public @interface Command
 {
     String name();
 
+    String[] aliases();
+
     String description();
 
     String structure();

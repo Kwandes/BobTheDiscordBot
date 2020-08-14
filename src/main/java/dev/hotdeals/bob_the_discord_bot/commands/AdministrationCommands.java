@@ -11,7 +11,7 @@ public class AdministrationCommands
 {
     private static final Logger LOGGER = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
-    @Command(name = "prefix", description = "Displays current bot prefix", structure = "prefix")
+    @Command(name = "prefix", aliases = {}, description = "Displays current bot prefix", structure = "prefix")
     public static void handlePrefix(MessageReceivedEvent event)
     {
         String commandPrefix = CoreCommands.findGuildCommandPrefix(event.getGuild().getId());
@@ -34,7 +34,7 @@ public class AdministrationCommands
         }
     }
 
-    @Command(name = "prefix change", description = "Changes bot prefix to a new one", structure = "prefix <newPrefix>")
+    @Command(name = "prefix change", aliases = {}, description = "Changes bot prefix to a new one", structure = "prefix <newPrefix>")
     private static void changePrefix(MessageReceivedEvent event, String[] splitMessage, String commandPrefix)
     {
         PrefixRepo.setPrefixForGuild(event.getGuild().getId(), splitMessage[1]);

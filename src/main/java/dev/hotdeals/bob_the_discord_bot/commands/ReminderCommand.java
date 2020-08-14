@@ -94,7 +94,7 @@ public class ReminderCommand
         LOGGER.info("Reminder Timer has been initiated");
     }
 
-    @Command(name = "reminder", description = "Sends a reminder via a private message after the specified period", structure = "reminder <time period> <message>")
+    @Command(name = "reminder", aliases = {"remind", "remindme"}, description = "Sends a reminder via a private message after the specified period", structure = "reminder <time period> <message>")
     public static boolean addReminder(String userId, LocalDateTime time, String contents)
     {
         Reminder reminder = new Reminder(0, userId, time, contents, "active");

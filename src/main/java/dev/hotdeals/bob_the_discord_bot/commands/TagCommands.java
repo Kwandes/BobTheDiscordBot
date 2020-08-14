@@ -55,7 +55,7 @@ public class TagCommands
         }
     }
 
-    @Command(name = "tag create", description = "Creates a tag", structure = "tag create <trigger> <response>")
+    @Command(name = "tag create", aliases = {"t create"}, description = "Creates a tag", structure = "tag create <trigger> <response>")
     private static void tagCreate(MessageReceivedEvent event, String[] splitMessage, String commandPrefix)
     {
         if (splitMessage.length < 4)
@@ -100,7 +100,7 @@ public class TagCommands
         }
     }
 
-    @Command(name = "tag edit", description = "Edit a tag", structure = "tag edit <trigger> <response>")
+    @Command(name = "tag edit", aliases = {"t edit"}, description = "Edit a tag", structure = "tag edit <trigger> <response>")
     private static void tagEdit(MessageReceivedEvent event, String[] splitMessage, String commandPrefix)
     {
         if (splitMessage.length < 4)
@@ -146,7 +146,7 @@ public class TagCommands
         }
     }
 
-    @Command(name = "tag remove", description = "Remove a tag", structure = "tag remove <trigger>")
+    @Command(name = "tag remove", aliases = {"t remove"}, description = "Remove a tag", structure = "tag remove <trigger>")
     private static void tagRemove(MessageReceivedEvent event, String[] splitMessage, String commandPrefix)
     {
         if (splitMessage.length < 3)
@@ -178,7 +178,7 @@ public class TagCommands
         }
     }
 
-    @Command(name = "tag list", description = "Displays a list of existing tags", structure = "tag list")
+    @Command(name = "tag list", aliases = {"t list"}, description = "Displays a list of existing tags", structure = "tag list")
     private static void tagList(MessageReceivedEvent event)
     {
         String tags = "";
@@ -192,7 +192,7 @@ public class TagCommands
         event.getChannel().sendMessage("**Here's a list of tags:**\n" + tags).queue();
     }
 
-    @Command(name = "tag", description = "Displays a tag", structure = "tag <trigger>")
+    @Command(name = "tag", aliases = {"t"}, description = "Displays a tag", structure = "tag <trigger>")
     public static void tagDisplay(MessageReceivedEvent event, String[] splitMessage)
     {
         HashMap<String, String> tagList = TagRepo.fetchTagsForGuild(event.getGuild().getId());

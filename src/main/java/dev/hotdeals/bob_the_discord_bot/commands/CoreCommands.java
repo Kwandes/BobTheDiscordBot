@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -47,7 +46,7 @@ public class CoreCommands extends ListenerAdapter
                 " called a command `" + event.getMessage().getContentRaw() + "`");
 
         String command = getFirstArgument(event.getMessage().getContentRaw(), commandPrefix, event.getJDA().getSelfUser().getId());
-        String[] splitMessage = null;
+        String[] splitMessage;
         switch (command)
         {
             case "tag":
@@ -121,7 +120,7 @@ public class CoreCommands extends ListenerAdapter
 
     //region command logic
 
-    @Command(name = "ping", description = "Displays latency between the client and the bot", structure = "ping")
+    @Command(name = "ping", aliases = {}, description = "Displays latency between the client and the bot", structure = "ping")
     private void sendPing(MessageReceivedEvent event)
     {
         long time = System.currentTimeMillis();
@@ -133,7 +132,7 @@ public class CoreCommands extends ListenerAdapter
     }
 
     // send an embed containing information regarding the bot
-    @Command(name = "status", description = "Displays information about the bot", structure = "status")
+    @Command(name = "status", aliases = {}, description = "Displays information about the bot", structure = "status")
     private void sendStatusMessage(MessageReceivedEvent event, String commandPrefix)
     {
         EmbedBuilder embed = new EmbedBuilder();
@@ -208,7 +207,7 @@ public class CoreCommands extends ListenerAdapter
         event.getChannel().sendMessage(embed.build()).queue();
     }
 
-    @Command(name = "help", description = "Displays information about a specific command", structure = "help <command>")
+    @Command(name = "help", aliases = {}, description = "Displays information about a specific command", structure = "help <command>")
     private void sendHelpMessage(MessageReceivedEvent event, String commandName, String commandPrefix)
     {
         EmbedBuilder embed = new EmbedBuilder();
@@ -220,7 +219,13 @@ public class CoreCommands extends ListenerAdapter
             embed.setDescription("Here is some commands related to \"" + commandName + "\":");
             for (Command command : commandList)
             {
-                embed.addField(commandPrefix + command.structure(), command.description(), false);
+                String aliases = "";
+                if (command.aliases().length != 0)
+                {
+                    aliases = Arrays.toString(command.aliases());
+                    aliases = "**Aliases:** " + Arrays.toString(command.aliases()).substring(1, aliases.length() - 1) + "\n";
+                }
+                embed.addField(commandPrefix + command.structure(), aliases + command.description(), false);
             }
         } else
         {
@@ -255,7 +260,8 @@ public class CoreCommands extends ListenerAdapter
                 continue; // skip methods that are not annotated as a @Command
             try
             {
-                if (method.getAnnotation(Command.class).name().contains(commandName))
+                if (method.getAnnotation(Command.class).name().contains(commandName) ||
+                        Arrays.asList(method.getAnnotation(Command.class).aliases()).contains(commandName))
                 {
                     matchingCommands.add(method.getAnnotation(Command.class));
                 }

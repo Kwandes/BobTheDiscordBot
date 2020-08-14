@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
@@ -109,8 +110,10 @@ public class CoreCommandsTest
     private static Stream<Arguments> getCommandInformationArguments()
     {
         return Stream.of(
-                Arguments.of("ping", "ping | Displays latency between the client and the bot | ping"),
-                Arguments.of("help", "help | Displays information about a specific command | help <command>")
+                Arguments.of("ping", "ping | [] | Displays latency between the client and the bot | ping"),
+                Arguments.of("help", "help | [] | Displays information about a specific command | help <command>"),
+                Arguments.of("reminder", "reminder | [remind, remindme] | Sends a reminder via a private message after the specified period | reminder <time period> <message>"),
+                Arguments.of("remindme", "reminder | [remind, remindme] | Sends a reminder via a private message after the specified period | reminder <time period> <message>")
         );
     }
 
@@ -121,7 +124,7 @@ public class CoreCommandsTest
     {
         ArrayList<Command> commandList = new CoreCommands().getCommandInformation(command);
         assertTrue(commandList.size() > 0, "No command called `" + command + "´ has been found");
-        assertEquals(commandList.get(0).name() + " | " +
+        assertEquals(commandList.get(0).name() + " | " + Arrays.toString(commandList.get(0).aliases()) + " | " +
                 commandList.get(0).description() + " | " + commandList.get(0).structure(), information);
     }
 }
