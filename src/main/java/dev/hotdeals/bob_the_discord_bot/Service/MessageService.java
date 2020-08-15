@@ -8,8 +8,12 @@ import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.awt.*;
+import java.awt.Color;
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class MessageService
 {
@@ -81,5 +85,40 @@ public class MessageService
         embed.setColor(new Color(0xff0000));
         embed.setDescription(message);
         return sendMessage(channel, embed.build());
+    }
+
+    /**
+     * Splits a message and combines the remainder, if it exists
+     * <p>
+     * All arguments except for the remainder are converted to lower cas
+     *
+     * @param message       the message to be formatted
+     * @param argumentCount how many arguments are supposed to exist. All extra arguments are merged with the last one
+     * @return split and formatted message, as a string array
+     */
+    public static List<String> formatMessageArguments(String message, int argumentCount)
+    {
+        if (argumentCount < 1) argumentCount = 1;
+        List<String> splitMessage = new ArrayList<>(Arrays.asList(message.split(" ")));
+        for (int i = 0; i < splitMessage.size(); i++)
+        {
+            if (i >= argumentCount)
+            {
+                splitMessage.set(argumentCount - 1, splitMessage.get(argumentCount - 1) + " " + splitMessage.get(i));
+                splitMessage.set(i, "");
+            }
+        }
+        splitMessage.removeAll(Collections.singletonList(""));
+
+        for (int i = 0; i < splitMessage.size(); i++)
+        {
+            if (i == 0)
+                splitMessage.set(i, splitMessage.get(i).toLowerCase());
+            if (i < argumentCount - 1)
+            {
+                splitMessage.set(i, splitMessage.get(i).toLowerCase());
+            }
+        }
+        return splitMessage;
     }
 }

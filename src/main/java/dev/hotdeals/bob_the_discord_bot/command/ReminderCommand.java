@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -28,24 +29,17 @@ public class ReminderCommand
 
     public static void processReminderCommand(MessageReceivedEvent event)
     {
-        String[] splitMessage = event.getMessage().getContentRaw().toLowerCase().split(" ");
+        List<String> splitMessage = MessageService.formatMessageArguments(event.getMessage().getContentRaw(), 3);
 
-        if (splitMessage.length < 3)
+        if (splitMessage.size() < 3)
         {
             LOGGER.debug("The command had too few parameters");
             MessageService.sendErrorMessage(event.getChannel(), "The command has too few parameters! Use `" +
                     CoreCommands.findGuildCommandPrefix(event.getGuild().getId()) + "help reminder` to learn more");
             return;
         }
-        //TODO make this split message thing pretty. Perhaps isolate it and move it to its own utility class
-        splitMessage[1] = splitMessage[1].toLowerCase();
-        // combine the remainder, if it exists
-        for (int i = 0; i < splitMessage.length; i++)
-        {
-            if (i > 2) splitMessage[2] += " " + splitMessage[i];
-        }
 
-        if (ReminderCommand.convertTextToSeconds(splitMessage[1]) == 0)
+        if (ReminderCommand.convertTextToSeconds(splitMessage.get(1)) == 0)
         {
             LOGGER.debug("The reminder date is right now or the time format is invalid! Denying it");
             MessageService.sendErrorMessage(event.getChannel(), "Invalid time format. Format example: `1y4d3h2m1s` *(1 year 4 days 3 hours 2 minutes 1 second)*!" +
@@ -54,13 +48,13 @@ public class ReminderCommand
             return;
         }
 
-        LocalDateTime reminderDate = LocalDateTime.now().plusSeconds(ReminderCommand.convertTextToSeconds(splitMessage[1]));
+        LocalDateTime reminderDate = LocalDateTime.now().plusSeconds(ReminderCommand.convertTextToSeconds(splitMessage.get(1)));
 
-        if (ReminderCommand.addReminder(event.getAuthor().getId(), reminderDate, splitMessage[2]))
+        if (ReminderCommand.addReminder(event.getAuthor().getId(), reminderDate, splitMessage.get(2)))
         {
-            LOGGER.info("Reminder added: `" + splitMessage[2] + "` on " + reminderDate + " by " + event.getAuthor());
-            MessageService.sendEmbedMessage(event.getChannel(), "I'll remind you to `" + splitMessage[2] + "` in `" +
-                    convertSecondsToTimePeriod(ReminderCommand.convertTextToSeconds(splitMessage[1])) + "`");
+            LOGGER.info("Reminder added: `" + splitMessage.get(2) + "` on " + reminderDate + " by " + event.getAuthor());
+            MessageService.sendEmbedMessage(event.getChannel(), "I'll remind you to `" + splitMessage.get(2) + "` in `" +
+                    convertSecondsToTimePeriod(ReminderCommand.convertTextToSeconds(splitMessage.get(1))) + "`");
         } else
         {
             LOGGER.warn("An issue occurred while adding a reminder");

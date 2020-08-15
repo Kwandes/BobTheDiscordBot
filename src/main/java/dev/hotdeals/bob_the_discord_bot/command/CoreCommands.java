@@ -28,6 +28,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class CoreCommands extends ListenerAdapter
 {
@@ -47,7 +48,7 @@ public class CoreCommands extends ListenerAdapter
                 " called a command `" + event.getMessage().getContentRaw() + "`");
 
         String command = getFirstArgument(event.getMessage().getContentRaw(), commandPrefix, event.getJDA().getSelfUser().getId());
-        String[] splitMessage;
+        List<String> splitMessage;
         switch (command)
         {
             case "tag":
@@ -64,13 +65,13 @@ public class CoreCommands extends ListenerAdapter
                 sendStatusMessage(event, commandPrefix);
                 break;
             case "help":
-                splitMessage = event.getMessage().getContentRaw().toLowerCase().split(" ");
-                if (splitMessage.length == 1)
+                splitMessage = MessageService.formatMessageArguments(event.getMessage().getContentRaw(), 2);
+                if (splitMessage.size() == 1)
                 {
                     sendEmptyHelpMessage(event, commandPrefix);
-                } else if (splitMessage.length >= 2)
+                } else if (splitMessage.size() >= 2)
                 {
-                    sendHelpMessage(event, splitMessage[1], commandPrefix);
+                    sendHelpMessage(event, splitMessage.get(1), commandPrefix);
                 }
                 break;
             case "remindme":
@@ -230,13 +231,7 @@ public class CoreCommands extends ListenerAdapter
         } else
         {
             MessageService.sendErrorMessage(event.getChannel(), "This command does not seem to exist");
-            //embed.setAuthor("Yikes...");
-            //embed.setColor(new Color(0xff0000)); // set color to red, for an error
-            //embed.setDescription("This command does not seem to exist");
         }
-
-        //event.getChannel().sendMessage(embed.build()).queue();
-        //MessageService.sendMessage(event.getChannel(), embed.build());
     }
 
     public ArrayList<Command> getCommandInformation(String commandName)
