@@ -4,8 +4,9 @@
     This class handles retrieval, creation, edition and removal of tags as well as sending them to the guild
  */
 
-package dev.hotdeals.bob_the_discord_bot.commands;
+package dev.hotdeals.bob_the_discord_bot.command;
 
+import dev.hotdeals.bob_the_discord_bot.Service.MessageService;
 import dev.hotdeals.bob_the_discord_bot.repository.TagRepo;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -30,8 +31,7 @@ public class TagCommands
         if (splitMessage.length < 2)
         {
             LOGGER.debug("The command had too few parameters");
-            event.getChannel().sendMessage("The command has too few parameters! Use `" + commandPrefix + "help tag` to learn more")
-                    .queue();
+            MessageService.sendErrorMessage(event.getChannel(), "The command has too few parameters! Use `" + commandPrefix + "help tag` to learn more");
             return;
         }
 
@@ -61,15 +61,14 @@ public class TagCommands
         if (splitMessage.length < 4)
         {
             LOGGER.debug("The command had too few parameters");
-            event.getChannel().sendMessage("The command has too few parameters! Use `" + commandPrefix + "help tag` to learn more")
-                    .queue();
+            MessageService.sendErrorMessage(event.getChannel(), "The command has too few parameters! Use `" + commandPrefix + "help tag create` to learn more");
             return;
         }
         // check for existing tags to avoid overlap
         if (TagRepo.fetchTagsForGuild(event.getGuild().getId()).containsKey(splitMessage[2]))
         {
             LOGGER.debug("A tag with the same name already exists.");
-            event.getChannel().sendMessage("A tag with the same name already exists!").queue();
+            MessageService.sendErrorMessage(event.getChannel(), "A tag with the same name already exists!");
             return;
         }
 
@@ -77,26 +76,24 @@ public class TagCommands
         if (splitMessage[2].length() > 100)
         {
             LOGGER.debug("The provided tag name was too long. Max limit: 100");
-            event.getChannel().sendMessage("The provided tag name was too long! Max limit: `100`")
-                    .queue();
+            MessageService.sendErrorMessage(event.getChannel(), "The provided tag name was too long! Max limit: `100`");
             return;
         } else if (splitMessage[3].length() > 2000)
         {
             // technically impossible as a discord message can't be more than 2000 but if it changes in the future, it would break the query
             LOGGER.debug("The provided tag content was too long. Max limit: 2000");
-            event.getChannel().sendMessage("The provided tag content was too long! Max limit: `2000`")
-                    .queue();
+            MessageService.sendErrorMessage(event.getChannel(), "The provided tag content was too long! Max limit: `2000`");
             return;
         }
 
         if (TagRepo.createTag(event.getGuild().getId(), splitMessage[2], splitMessage[3]))
         {
             LOGGER.debug("Adding the new tag to the DB: " + splitMessage[2]);
-            event.getChannel().sendMessage("A new tag has been added: `" + splitMessage[2] + " - " + splitMessage[3] + "`").queue();
+            MessageService.sendEmbedMessage(event.getChannel(), "A new tag has been added: `" + splitMessage[2] + " - " + splitMessage[3] + "`");
         } else
         {
             LOGGER.debug("Failed to add a tag: " + event.getGuild().getId() + "/" + splitMessage[2]);
-            event.getChannel().sendMessage("Failed to add a tag `" + splitMessage[2] + "`! Possible causes: issues with database connection").queue();
+            MessageService.sendErrorMessage(event.getChannel(), "Failed to add a tag `" + splitMessage[2] + "`! Possible causes: issues with database connection");
         }
     }
 
@@ -106,8 +103,7 @@ public class TagCommands
         if (splitMessage.length < 4)
         {
             LOGGER.debug("The command had too few parameters");
-            event.getChannel().sendMessage("The command has too few parameters! Use `" + commandPrefix + "help tag` to learn more")
-                    .queue();
+            MessageService.sendErrorMessage(event.getChannel(), "The command has too few parameters! Use `" + commandPrefix + "help tag edit` to learn more");
             return;
         }
 
@@ -115,7 +111,7 @@ public class TagCommands
         if (!TagRepo.fetchTagsForGuild(event.getGuild().getId()).containsKey(splitMessage[2]))
         {
             LOGGER.debug("A tag with the name '" + splitMessage[2] + "' doesn't exist.");
-            event.getChannel().sendMessage("A tag with the name `" + splitMessage[2] + "` doesn't exist!").queue();
+            MessageService.sendErrorMessage(event.getChannel(), "A tag with the name `" + splitMessage[2] + "` doesn't exist!");
             return;
         }
 
@@ -123,26 +119,22 @@ public class TagCommands
         if (splitMessage[2].length() > 100)
         {
             LOGGER.debug("The provided tag name was too long. Max limit: 100");
-            event.getChannel().sendMessage("The provided tag name was too long. Max limit: `100`")
-                    .queue();
+            MessageService.sendErrorMessage(event.getChannel(), "The provided tag name was too long. Max limit: `100`");
         } else if (splitMessage[3].length() > 2000)
         {
             // technically impossible as a discord message can't be more than 2000 but if it changes in the future, it would break the query
             LOGGER.debug("The provided tag content was too long. Max limit: 2000");
-            event.getChannel().sendMessage("The provided tag content was too long. Max limit: `2000`")
-                    .queue();
+            MessageService.sendErrorMessage(event.getChannel(), "The provided tag content was too long. Max limit: `2000`");
         }
 
         if (TagRepo.updateTag(event.getGuild().getId(), splitMessage[2], splitMessage[3]))
         {
             LOGGER.debug("Edited an existing tag: " + event.getGuild().getId() + "/" + splitMessage[2]);
-            event.getChannel().sendMessage(
-                    "The tag has been edited: `" + splitMessage[2] + " - " + splitMessage[3] + "`").queue();
+            MessageService.sendEmbedMessage(event.getChannel(), "The tag has been edited: `" + splitMessage[2] + " - " + splitMessage[3] + "`");
         } else
         {
             LOGGER.debug("Failed to edit a tag: " + event.getGuild().getId() + "/" + splitMessage[2]);
-            event.getChannel().sendMessage(
-                    "Failed to edit a tag `" + splitMessage[2] + "`! Possible causes: issues with database connection").queue();
+            MessageService.sendErrorMessage(event.getChannel(), "Failed to edit a tag `" + splitMessage[2] + "`! Possible causes: issues with database connection");
         }
     }
 
@@ -152,8 +144,7 @@ public class TagCommands
         if (splitMessage.length < 3)
         {
             LOGGER.debug("The command had too few parameters");
-            event.getChannel().sendMessage(
-                    "The command has too few parameters! Use `" + commandPrefix + "help tag` to learn more").queue();
+            MessageService.sendErrorMessage(event.getChannel(), "The command has too few parameters! Use `" + commandPrefix + "help tag remove` to learn more");
             return;
         }
 
@@ -161,7 +152,7 @@ public class TagCommands
         if (!TagRepo.fetchTagsForGuild(event.getGuild().getId()).containsKey(splitMessage[2]))
         {
             LOGGER.debug("A tag with the name '" + splitMessage[2] + "' doesn't exists.");
-            event.getChannel().sendMessage("A tag with the name `" + splitMessage[2] + "` doesn't exists!").queue();
+            MessageService.sendErrorMessage(event.getChannel(), "A tag with the name `" + splitMessage[2] + "` doesn't exists!");
             return;
         }
 
@@ -169,27 +160,26 @@ public class TagCommands
         if (TagRepo.deleteTag(event.getGuild().getId(), splitMessage[2]))
         {
             LOGGER.debug("Removed a tag: " + event.getGuild().getId() + "/" + splitMessage[2]);
-            event.getChannel().sendMessage("The tag `" + splitMessage[2] + "` has been removed").queue();
+            MessageService.sendEmbedMessage(event.getChannel(), "The tag `" + splitMessage[2] + "` has been removed");
         } else
         {
             LOGGER.debug("Failed to remove a tag: " + event.getGuild().getId() + "/" + splitMessage[2]);
-            event.getChannel().sendMessage(
-                    "Failed to remove a tag `" + splitMessage[2] + "`! Possible causes: issues with database connection").queue();
+            MessageService.sendErrorMessage(event.getChannel(), "Failed to remove a tag `" + splitMessage[2] + "`! Possible causes: issues with database connection");
         }
     }
 
     @Command(name = "tag list", aliases = {"t list"}, description = "Displays a list of existing tags", structure = "tag list")
     private static void tagList(MessageReceivedEvent event)
     {
-        String tags = "";
+        StringBuilder tags = new StringBuilder();
         for (String tag : TagRepo.fetchTagsForGuild(event.getGuild().getId()).keySet())
         {
-            tags += "`" + tag + "`, ";
+            tags.append("`").append(tag).append("`, ");
         }
         // remove the extra ', ' at the end of the list
-        if (tags.length() > 0) tags = tags.substring(0, tags.length() - 2);
+        if (tags.length() > 0) tags = new StringBuilder(tags.substring(0, tags.length() - 2));
 
-        event.getChannel().sendMessage("**Here's a list of tags:**\n" + tags).queue();
+        MessageService.sendEmbedMessage(event.getChannel(), "**Here's a list of tags:**\n" + tags);
     }
 
     @Command(name = "tag", aliases = {"t"}, description = "Displays a tag", structure = "tag <trigger>")
@@ -200,8 +190,7 @@ public class TagCommands
         if (tagList.isEmpty())
         {
             LOGGER.debug("The tag list is empty.");
-            event.getChannel().sendMessage("The tag list is empty! This might be due to invalid Database connection")
-                    .queue();
+            MessageService.sendErrorMessage(event.getChannel(), "The tag list is empty! This might be due to invalid Database connection");
             return;
         }
 
@@ -212,8 +201,7 @@ public class TagCommands
         } else
         {
             LOGGER.debug("A tag with the name '" + splitMessage[1] + "' doesn't exists.");
-            event.getChannel().sendMessage(
-                    "A tag with the name `" + splitMessage[1] + "` doesn't exists!").queue();
+            MessageService.sendErrorMessage(event.getChannel(), "A tag with the name `" + splitMessage[1] + "` doesn't exists!");
         }
     }
 

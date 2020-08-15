@@ -2,14 +2,14 @@
     Handles a RemindMe command. User sets a time after which the bot is supposed to message them with a custom reminder
  */
 
-package dev.hotdeals.bob_the_discord_bot.commands;
+package dev.hotdeals.bob_the_discord_bot.command;
 
 import dev.hotdeals.bob_the_discord_bot.BobTheDiscordBot;
+import dev.hotdeals.bob_the_discord_bot.Service.MessageService;
 import dev.hotdeals.bob_the_discord_bot.model.Reminder;
 import dev.hotdeals.bob_the_discord_bot.repository.ReminderRepo;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,9 +33,8 @@ public class ReminderCommand
         if (splitMessage.length < 3)
         {
             LOGGER.debug("The command had too few parameters");
-            event.getChannel().sendMessage("The command has too few parameters! Use `" +
-                    CoreCommands.findGuildCommandPrefix(event.getGuild().getId()) + "help tag` to learn more")
-                    .queue();
+            MessageService.sendErrorMessage(event.getChannel(), "The command has too few parameters! Use `" +
+                    CoreCommands.findGuildCommandPrefix(event.getGuild().getId()) + "help reminder` to learn more");
             return;
         }
         //TODO make this split message thing pretty. Perhaps isolate it and move it to its own utility class
@@ -49,11 +48,9 @@ public class ReminderCommand
         if (ReminderCommand.convertTextToSeconds(splitMessage[1]) == 0)
         {
             LOGGER.debug("The reminder date is right now or the time format is invalid! Denying it");
-            event.getChannel().sendMessage(
-                    "Invalid time format. Format example: `1y4d3h2m1s` *(1 year 4 days 3 hours 2 minutes 1 second)*!" +
-                            "\nMaximum period: `10 years`\nMinimum period: `1 second`" +
-                            "\nUse `" + CoreCommands.findGuildCommandPrefix(event.getGuild().getId()) + "help reminder` to learn more")
-                    .queue();
+            MessageService.sendErrorMessage(event.getChannel(), "Invalid time format. Format example: `1y4d3h2m1s` *(1 year 4 days 3 hours 2 minutes 1 second)*!" +
+                    "\nMaximum period: `10 years`\nMinimum period: `1 second`" +
+                    "\nUse `" + CoreCommands.findGuildCommandPrefix(event.getGuild().getId()) + "help reminder` to learn more");
             return;
         }
 
@@ -62,12 +59,12 @@ public class ReminderCommand
         if (ReminderCommand.addReminder(event.getAuthor().getId(), reminderDate, splitMessage[2]))
         {
             LOGGER.info("Reminder added: `" + splitMessage[2] + "` on " + reminderDate + " by " + event.getAuthor());
-            event.getChannel().sendMessage("I'll remind you to `" + splitMessage[2] + "` in `" +
-                    convertSecondsToTimePeriod(ReminderCommand.convertTextToSeconds(splitMessage[1])) + "`").queue();
+            MessageService.sendEmbedMessage(event.getChannel(), "I'll remind you to `" + splitMessage[2] + "` in `" +
+                    convertSecondsToTimePeriod(ReminderCommand.convertTextToSeconds(splitMessage[1])) + "`");
         } else
         {
             LOGGER.warn("An issue occurred while adding a reminder");
-            event.getChannel().sendMessage("Failed to add a reminder, an issue occurred while processing it. Try again later").queue();
+            MessageService.sendErrorMessage(event.getChannel(), "Failed to add a reminder, an issue occurred while processing it. Try again later");
         }
     }
 
@@ -109,16 +106,12 @@ public class ReminderCommand
             LOGGER.warn("Failed to find a user " + reminder.getUserId() + ". Reminder " + reminder.getReminderId() + " has not been sent");
         } else
         {
-            try
+            if (MessageService.sendPrivateMessage(user, "You've asked me to remind you: `" + reminder.getReminder() + "`"))
             {
-                user.openPrivateChannel().queue((privateChannel) ->
-                {
-                    privateChannel.sendMessage("You've asked me to remind you: " + reminder.getReminder()).queue();
-                });
                 LOGGER.info("Reminder has been sent: " + reminder);
-            } catch (ErrorResponseException e)
+            } else
             {
-                LOGGER.error("Failed to send a reminder to " + reminder.getUserId(), e);
+                LOGGER.warn("Failed to send a reminder to " + reminder.getUserId());
             }
         }
     }

@@ -1,7 +1,7 @@
 package dev.hotdeals.bob_the_discord_bot;
 
-import dev.hotdeals.bob_the_discord_bot.commands.Command;
-import dev.hotdeals.bob_the_discord_bot.commands.CoreCommands;
+import dev.hotdeals.bob_the_discord_bot.command.Command;
+import dev.hotdeals.bob_the_discord_bot.command.CoreCommands;
 import net.dv8tion.jda.api.entities.ChannelType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;

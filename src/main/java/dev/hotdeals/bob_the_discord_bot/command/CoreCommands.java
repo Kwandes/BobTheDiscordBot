@@ -3,8 +3,9 @@
     Only handles mapping of the commands
  */
 
-package dev.hotdeals.bob_the_discord_bot.commands;
+package dev.hotdeals.bob_the_discord_bot.command;
 
+import dev.hotdeals.bob_the_discord_bot.Service.MessageService;
 import dev.hotdeals.bob_the_discord_bot.repository.StatusRepo;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -126,9 +127,7 @@ public class CoreCommands extends ListenerAdapter
         long time = System.currentTimeMillis();
         event.getChannel().sendMessage("Pong!") /* => RestAction<Message> */
                 .queue(response /* => Message */ ->
-                {
-                    response.editMessageFormat("Pong: %d ms", System.currentTimeMillis() - time).queue();
-                });
+                        response.editMessageFormat("Pong: %d ms", System.currentTimeMillis() - time).queue());
     }
 
     // send an embed containing information regarding the bot
@@ -204,7 +203,7 @@ public class CoreCommands extends ListenerAdapter
         embed.setAuthor("Help Menu");
         embed.setDescription("Use `" + commandPrefix + "help <command>` for more information");
 
-        event.getChannel().sendMessage(embed.build()).queue();
+        MessageService.sendMessage(event.getChannel(), embed.build());
     }
 
     @Command(name = "help", aliases = {}, description = "Displays information about a specific command", structure = "help <command>")
@@ -227,14 +226,17 @@ public class CoreCommands extends ListenerAdapter
                 }
                 embed.addField(commandPrefix + command.structure(), aliases + command.description(), false);
             }
+            MessageService.sendMessage(event.getChannel(), embed.build());
         } else
         {
-            embed.setAuthor("Yikes...");
-            embed.setColor(new Color(0xff0000)); // set color to red, for an error
-            embed.setDescription("This command does not seem to exist");
+            MessageService.sendErrorMessage(event.getChannel(), "This command does not seem to exist");
+            //embed.setAuthor("Yikes...");
+            //embed.setColor(new Color(0xff0000)); // set color to red, for an error
+            //embed.setDescription("This command does not seem to exist");
         }
 
-        event.getChannel().sendMessage(embed.build()).queue();
+        //event.getChannel().sendMessage(embed.build()).queue();
+        //MessageService.sendMessage(event.getChannel(), embed.build());
     }
 
     public ArrayList<Command> getCommandInformation(String commandName)

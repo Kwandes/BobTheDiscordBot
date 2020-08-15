@@ -2,7 +2,7 @@
     An Annotation interface used for marking command methods and providing information
  */
 
-package dev.hotdeals.bob_the_discord_bot.commands;
+package dev.hotdeals.bob_the_discord_bot.command;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

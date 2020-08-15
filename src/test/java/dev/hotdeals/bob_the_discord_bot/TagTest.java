@@ -1,6 +1,6 @@
 package dev.hotdeals.bob_the_discord_bot;
 
-import dev.hotdeals.bob_the_discord_bot.commands.TagCommands;
+import dev.hotdeals.bob_the_discord_bot.command.TagCommands;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestMethodOrder;

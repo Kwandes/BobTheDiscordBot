@@ -1,5 +1,6 @@
-package dev.hotdeals.bob_the_discord_bot.commands;
+package dev.hotdeals.bob_the_discord_bot.command;
 
+import dev.hotdeals.bob_the_discord_bot.Service.MessageService;
 import dev.hotdeals.bob_the_discord_bot.repository.PrefixRepo;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.apache.logging.log4j.LogManager;
@@ -19,15 +20,13 @@ public class AdministrationCommands
 
         if (splitMessage.length == 1)
         {
-            event.getChannel().sendMessage("The current Prefix is '" + commandPrefix + "'") /* => RestAction<Message> */
-                    .queue();
+            MessageService.sendMessage(event.getChannel(), "The current Prefix is '" + commandPrefix + "'");
             return;
         }
 
         if (splitMessage[1].length() > 3)
         {
-            event.getChannel().sendMessage("New prefix is too long, max characters: 3, provided prefix: " + splitMessage[1].length())
-                    .queue();
+            MessageService.sendErrorMessage(event.getChannel(), "New prefix is too long, max characters: 3, provided prefix: " + splitMessage[1].length());
         } else
         {
             changePrefix(event, splitMessage, commandPrefix);
@@ -45,14 +44,12 @@ public class AdministrationCommands
                 !CoreCommands.getGuildPrefixes().get(event.getGuild().getId()).equals(splitMessage[1]))
         {
             LOGGER.warn("Failed to set a new prefix due to DB connection issues");
-            event.getChannel().sendMessage("Failed to set a new prefix due to DB connection issues")
-                    .queue();
+            MessageService.sendErrorMessage(event.getChannel(), "Failed to set a new prefix due to DB connection issues");
         } else
         {
             LOGGER.info(event.getGuild() + " changed prefix from + " + commandPrefix + " to " + splitMessage[1]);
             commandPrefix = splitMessage[1];
-            event.getChannel().sendMessage("Prefix has been set to " + commandPrefix)
-                    .queue();
+            MessageService.sendMessage(event.getChannel(), "Prefix has been set to " + commandPrefix);
             CoreCommands.setGuildPrefixes(PrefixRepo.fetchPrefixes()); // refresh the list
         }
     }

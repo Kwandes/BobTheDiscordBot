@@ -4,8 +4,8 @@
 
 package dev.hotdeals.bob_the_discord_bot;
 
-import dev.hotdeals.bob_the_discord_bot.commands.CoreCommands;
-import dev.hotdeals.bob_the_discord_bot.commands.ReminderCommand;
+import dev.hotdeals.bob_the_discord_bot.command.CoreCommands;
+import dev.hotdeals.bob_the_discord_bot.command.ReminderCommand;
 import dev.hotdeals.bob_the_discord_bot.config.Config;
 import dev.hotdeals.bob_the_discord_bot.config.JdbcConfig;
 import dev.hotdeals.bob_the_discord_bot.repository.PrefixRepo;
