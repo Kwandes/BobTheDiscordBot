@@ -21,7 +21,7 @@ public class AdministrationCommands
 
         if (splitMessage.size() == 1)
         {
-            MessageService.sendMessage(event.getChannel(), "The current Prefix is '" + commandPrefix + "'");
+            MessageService.sendEmbedMessage(event.getChannel(), "The current Prefix is '" + commandPrefix + "'");
             return;
         }
 
@@ -50,7 +50,7 @@ public class AdministrationCommands
         {
             LOGGER.info(event.getGuild() + " changed prefix from + " + commandPrefix + " to " + newPrefix);
             commandPrefix = newPrefix;
-            MessageService.sendMessage(event.getChannel(), "Prefix has been set to " + commandPrefix);
+            MessageService.sendEmbedMessage(event.getChannel(), "Prefix has been set to " + commandPrefix);
             CoreCommands.setGuildPrefixes(PrefixRepo.fetchPrefixes()); // refresh the list
         }
     }
