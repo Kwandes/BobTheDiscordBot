@@ -75,6 +75,7 @@ public class BobTheDiscordBot
 
             jda.addEventListener(new CoreCommands());
 
+            MessageService.sendBootMessage();
         } catch (LoginException e)
         {
             //If anything goes wrong in terms of authentication, this is the exception that will represent it

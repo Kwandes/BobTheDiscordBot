@@ -94,6 +94,44 @@ public class MessageService
         return sendMessage(channel, embed.build());
     }
 
+    public static void sendBootMessage()
+    {
+        Config config = BobTheDiscordBot.getConfig();
+        JDA jda = BobTheDiscordBot.getJda();
+        if (!config.getProperties().getProperty("monitoringChannel").isEmpty())
+        {
+            try
+            {
+                TextChannel monitoringChannel = jda.getTextChannelById(config.getProperties().getProperty("monitoringChannel"));
+                if (monitoringChannel != null)
+                {
+                    try (FileReader fr = new FileReader("pom.xml"))
+                    {
+                        MavenXpp3Reader reader = new MavenXpp3Reader();
+                        Model model = reader.read(fr);
+                        String buildVersion = model.getVersion();
+                        String jdaVersion = model.getDependencies().get(0).getVersion();
+                        String javaVersion = model.getProperties().getProperty("maven.compiler.source");
+                        EmbedBuilder embed = new EmbedBuilder();
+                        embed.setTitle("The bot has booted up");
+                        if (jda.getPresence().getActivity() != null)
+                            embed.setDescription(jda.getPresence().getActivity().getName() + "!");
+                        embed.addField("Build Info", "```fix\nVersion: " + buildVersion + "\nJDA: " + jdaVersion + "\nJava: " + javaVersion + "```", false);
+                        embed.setFooter(LocalDateTime.now().toString());
+                        embed.setColor(MessageService.getEmbedColor());
+                        MessageService.sendMessage(monitoringChannel, embed.build());
+                    } catch (IOException | XmlPullParserException e)
+                    {
+                        LOGGER.error("An error occurred during parsing of the pom.xml data", e);
+                    }
+                } else LOGGER.warn("The monitoring channel is not valid!");
+            } catch (NumberFormatException e)
+            {
+                LOGGER.warn("The provided channel ID was invalid", e);
+            }
+        }
+    }
+
     /**
      * Splits a message and combines the remainder, if it exists
      * <p>

@@ -6,7 +6,7 @@
 
     <groupId>dev.hotdeals</groupId>
     <artifactId>bob_the_discord_bot</artifactId>
-    <version>0.6.0</version>
+    <version>0.6.1</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
