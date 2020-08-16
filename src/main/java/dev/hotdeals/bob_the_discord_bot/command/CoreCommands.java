@@ -25,9 +25,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 
 public class CoreCommands extends ListenerAdapter
@@ -199,11 +197,24 @@ public class CoreCommands extends ListenerAdapter
     private void sendEmptyHelpMessage(MessageReceivedEvent event, String commandPrefix)
     {
         EmbedBuilder embed = new EmbedBuilder();
-
         embed.setColor(new Color(0x6A2396)); // set color to purple
-        embed.setAuthor("Help Menu");
-        embed.setDescription("Use `" + commandPrefix + "help <command>` for more information");
-
+        embed.setTitle("Here are all the available commands:");
+        embed.setFooter("Use " + commandPrefix + "help <command> for more information");
+        List<List<Command>> commandList = getCommands();
+        StringBuilder commandNames = new StringBuilder("**Commands:**");
+        for (List<Command> commandType : commandList)
+        {
+            for (Command command : commandType)
+            {
+                // skip sub-commands, like `tag create`
+                if (!command.name().contains(" "))
+                {
+                    commandNames.append(" `").append(command.name()).append("`,");
+                }
+            }
+        }
+        commandNames.deleteCharAt(commandNames.length() - 1);
+        embed.setDescription(commandNames.toString());
         MessageService.sendMessage(event.getChannel(), embed.build());
     }
 
@@ -212,7 +223,7 @@ public class CoreCommands extends ListenerAdapter
     {
         EmbedBuilder embed = new EmbedBuilder();
 
-        ArrayList<Command> commandList = getCommandInformation(commandName);
+        List<Command> commandList = getCommandInformation(commandName);
         if (commandList.size() != 0)
         {
             embed.setColor(new Color(0x6A2396)); // set color to purple
@@ -234,42 +245,59 @@ public class CoreCommands extends ListenerAdapter
         }
     }
 
-    public ArrayList<Command> getCommandInformation(String commandName)
+    public List<Command> getCommandInformation(String commandName)
+    {
+        List<Command> matchingCommands = new ArrayList<>();
+        for (List<Command> commandList : getCommands())
+        {
+            for (Command command : commandList)
+                try
+                {
+                    if (command.name().contains(commandName) ||
+                            Arrays.asList(command.aliases()).contains(commandName))
+                    {
+                        matchingCommands.add(command);
+                    }
+                } catch (NullPointerException e)
+                {
+                    // very unlikely unless a human error happens in the validation code
+                    // critical if it does get through
+                    LOGGER.error("An invalid method has been looked up during Command Annotation search", e);
+                }
+        }
+        return matchingCommands;
+    }
+
+
+    public List<List<Command>> getCommands()
     {
         // need to manually add classes with commands
-        ArrayList<Method> methods = new ArrayList<>();
-
         Class<? extends CoreCommands> coreCommands = CoreCommands.class;
         Class<? extends TagCommands> tagCommands = TagCommands.class;
         Class<? extends AdministrationCommands> adminCommands = AdministrationCommands.class;
         Class<? extends ReminderCommand> reminderCommand = ReminderCommand.class;
 
-        methods.addAll(Arrays.asList(coreCommands.getDeclaredMethods()));
-        methods.addAll(Arrays.asList(tagCommands.getDeclaredMethods()));
-        methods.addAll(Arrays.asList(adminCommands.getDeclaredMethods()));
-        methods.addAll(Arrays.asList(reminderCommand.getDeclaredMethods()));
+        List<List<Method>> methods = new ArrayList<>();
 
-        // iterate through the methods and filter for matching commands
-        ArrayList<Command> matchingCommands = new ArrayList<>();
-        for (Method method : methods)
+        methods.add(Arrays.asList(coreCommands.getDeclaredMethods()));
+        methods.add(Arrays.asList(tagCommands.getDeclaredMethods()));
+        methods.add(Arrays.asList(adminCommands.getDeclaredMethods()));
+        methods.add(Arrays.asList(reminderCommand.getDeclaredMethods()));
+
+        List<List<Command>> commands = new ArrayList<>();
+        for (List<Method> methodList : methods)
         {
-            if (!method.isAnnotationPresent(Command.class))
-                continue; // skip methods that are not annotated as a @Command
-            try
+            List<Command> commandList = new ArrayList<>();
+            for (Method method : methodList)
             {
-                if (method.getAnnotation(Command.class).name().contains(commandName) ||
-                        Arrays.asList(method.getAnnotation(Command.class).aliases()).contains(commandName))
+                if (method.isAnnotationPresent(Command.class))
                 {
-                    matchingCommands.add(method.getAnnotation(Command.class));
+                    commandList.add(method.getAnnotation(Command.class));
                 }
-            } catch (NullPointerException e)
-            {
-                // very unlikely unless a human error happens in the validation code
-                // critical if it does get through
-                LOGGER.error("An invalid method has been looked up during Command Annotation search", e);
             }
+            commands.addAll(Collections.singleton(commandList));
         }
-        return matchingCommands;
+        return commands;
     }
     //endregion
 

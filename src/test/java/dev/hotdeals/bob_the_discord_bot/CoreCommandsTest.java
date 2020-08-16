@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -122,7 +123,7 @@ public class CoreCommandsTest
     @DisplayName("Get Command Information")
     void getCommandInformation(String command, String information)
     {
-        ArrayList<Command> commandList = new CoreCommands().getCommandInformation(command);
+        List<Command> commandList = new CoreCommands().getCommandInformation(command);
         assertTrue(commandList.size() > 0, "No command called `" + command + "´ has been found");
         assertEquals(commandList.get(0).name() + " | " + Arrays.toString(commandList.get(0).aliases()) + " | " +
                 commandList.get(0).description() + " | " + commandList.get(0).structure(), information);
