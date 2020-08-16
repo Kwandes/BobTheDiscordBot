@@ -42,7 +42,8 @@ public class JdbcConfig
         properties = new Properties();
         FileInputStream fi = new FileInputStream("src/main/resources/" + configFileName);
         properties.load(fi);
-        LOGGER.trace("The config.properties file has been loaded");
+        fi.close();
+        LOGGER.debug("The config.properties file has been loaded");
     }
 
     public Connection getConnection() throws SQLException

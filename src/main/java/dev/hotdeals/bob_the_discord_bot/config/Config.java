@@ -5,6 +5,7 @@
 
 package dev.hotdeals.bob_the_discord_bot.config;
 
+import dev.hotdeals.bob_the_discord_bot.repository.ConfigRepo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,10 +36,17 @@ public class Config
 
     public void loadProperties() throws IOException
     {
-        properties = new Properties();
-        FileInputStream fi = new FileInputStream("src/main/resources/" + configFileName);
-        properties.load(fi);
-        LOGGER.debug("The config.properties file has been loaded");
+        LOGGER.debug("Fetching properties from the database");
+        this.properties = ConfigRepo.fetchConfig();
+        LOGGER.debug("Fetching properties is finished");
+        if (properties.isEmpty())
+        {
+            LOGGER.warn("Properties loaded from the database were empty. Loading config.properties instead");
+            FileInputStream fi = new FileInputStream("src/main/resources/" + configFileName);
+            this.properties.load(fi);
+            fi.close();
+            LOGGER.debug("The config.properties file has been loaded");
+        }
         LOGGER.debug("Retrieving and assigning environment variables");
         setEnvVariables();
         LOGGER.debug("Environment variables have been loaded and set");
@@ -48,7 +56,8 @@ public class Config
     private void setEnvVariables() throws NullPointerException
     {
         LOGGER.debug("Processing the bot token env variable");
-        this.properties.setProperty("botToken", System.getenv(getProperties().getProperty("botToken")));
+        String botToken = System.getenv(getProperties().getProperty("botToken"));
+        this.properties.setProperty("botToken", botToken);
     }
 
     public Properties getProperties()

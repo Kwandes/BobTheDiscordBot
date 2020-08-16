@@ -1,19 +1,26 @@
 package dev.hotdeals.bob_the_discord_bot.Service;
 
+import dev.hotdeals.bob_the_discord_bot.BobTheDiscordBot;
+import dev.hotdeals.bob_the_discord_bot.config.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.awt.Color;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class MessageService
 {
@@ -58,7 +65,7 @@ public class MessageService
     {
         EmbedBuilder embed = new EmbedBuilder();
         embed.setDescription(message);
-        embed.setColor(new Color(0x6A2396));
+        embed.setColor(getEmbedColor());
 
         return sendMessage(channel, embed.build());
     }
@@ -82,7 +89,7 @@ public class MessageService
     {
         EmbedBuilder embed = new EmbedBuilder();
         embed.setAuthor("Yikes...");
-        embed.setColor(new Color(0xff0000));
+        embed.setColor(getEmbedErrorColor());
         embed.setDescription(message);
         return sendMessage(channel, embed.build());
     }
@@ -120,5 +127,31 @@ public class MessageService
             }
         }
         return splitMessage;
+    }
+
+    public static Color getEmbedColor()
+    {
+        Color color = new Color(0x6A2396);
+        try
+        {
+            color = new Color(Integer.decode(Config.getInstance().getProperties().getProperty("embedColor")));
+        } catch (NumberFormatException e)
+        {
+            LOGGER.warn("Failed to parse embed color from the config: " + Config.getInstance().getProperties().getProperty("embedColor"));
+        }
+        return color;
+    }
+
+    public static Color getEmbedErrorColor()
+    {
+        Color color = Color.RED;
+        try
+        {
+            color = new Color(Integer.decode(Config.getInstance().getProperties().getProperty("embedErrorColor")));
+        } catch (NumberFormatException e)
+        {
+            LOGGER.warn("Failed to parse embed Error color from the config");
+        }
+        return color;
     }
 }

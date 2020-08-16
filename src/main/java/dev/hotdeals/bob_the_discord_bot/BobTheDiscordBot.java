@@ -4,6 +4,7 @@
 
 package dev.hotdeals.bob_the_discord_bot;
 
+import dev.hotdeals.bob_the_discord_bot.Service.MessageService;
 import dev.hotdeals.bob_the_discord_bot.command.CoreCommands;
 import dev.hotdeals.bob_the_discord_bot.command.ReminderCommand;
 import dev.hotdeals.bob_the_discord_bot.config.Config;
@@ -41,21 +42,28 @@ public class BobTheDiscordBot
                 System.exit(41); // 41 - config property is null
             }
 
-            String displayedActivity = config.getProperties().getProperty("displayedActivity");
+            String displayedActivity = config.getProperties().getProperty("activity");
             if (displayedActivity == null)
             {
-                LOGGER.warn("Failed to retrieve the 'displayedActivity' property from the config. Setting it to 'Ping Pong'");
-                displayedActivity = "Ping Pong";
+                LOGGER.warn("Failed to retrieve the 'displayedActivity' property from the config. Setting it to 'Database Connection Failed'");
+                displayedActivity = "Database Connection Failed";
             }
 
-            CoreCommands.setDefaultCommandPrefix(config.getProperties().getProperty("commandPrefix"));
+            CoreCommands.setDefaultCommandPrefix(config.getProperties().getProperty("defaultCommandPrefix"));
             if (CoreCommands.getDefaultCommandPrefix() == null)
             {
-                LOGGER.warn("Failed to retrieve the 'commandPrefix' property from the config. Setting it to '!'");
+                LOGGER.warn("Failed to retrieve the 'defaultCommandPrefix' property from the config. Setting it to '!'");
                 CoreCommands.setDefaultCommandPrefix("!");
             }
+
             CoreCommands.setGuildPrefixes(PrefixRepo.fetchPrefixes());
-            LOGGER.debug("Command prefixes have been loaded");
+            if (CoreCommands.getGuildPrefixes() == null)
+            {
+                LOGGER.warn("Failed to retrieve the guild command prefixes! All guilds will be using the default prefix");
+            } else
+            {
+                LOGGER.debug("Command prefixes have been loaded");
+            }
 
             ReminderCommand.checkReminders();
 
@@ -84,16 +92,6 @@ public class BobTheDiscordBot
 
     private static void setupConfig()
     {
-        config = Config.getInstance();
-        try
-        {
-            config.loadProperties();
-        } catch (Exception e)
-        {
-            LOGGER.fatal("Failed to initialize the application config. CLosing the application", e);
-            System.exit(40); // 40 - failed to initialize the config
-        }
-
         jdbcConfig = JdbcConfig.getInstance();
         try
         {
@@ -102,6 +100,16 @@ public class BobTheDiscordBot
         } catch (IOException e)
         {
             LOGGER.error("Database connection properties have failed to load: " + e);
+        }
+
+        config = Config.getInstance();
+        try
+        {
+            config.loadProperties();
+        } catch (Exception e)
+        {
+            LOGGER.fatal("Failed to initialize the application config. CLosing the application", e);
+            System.exit(40); // 40 - failed to initialize the config
         }
     }
 

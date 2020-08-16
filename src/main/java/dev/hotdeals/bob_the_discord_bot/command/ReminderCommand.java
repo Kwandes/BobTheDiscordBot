@@ -6,6 +6,7 @@ package dev.hotdeals.bob_the_discord_bot.command;
 
 import dev.hotdeals.bob_the_discord_bot.BobTheDiscordBot;
 import dev.hotdeals.bob_the_discord_bot.Service.MessageService;
+import dev.hotdeals.bob_the_discord_bot.config.Config;
 import dev.hotdeals.bob_the_discord_bot.model.Reminder;
 import dev.hotdeals.bob_the_discord_bot.repository.ReminderRepo;
 import net.dv8tion.jda.api.entities.User;
@@ -81,7 +82,15 @@ public class ReminderCommand
                 }
             }
         };
-        new Timer("Reminder Check").schedule(sendReminders, TimeUnit.SECONDS.toMillis(10), TimeUnit.SECONDS.toMillis(60));
+        long timerFrequency = TimeUnit.SECONDS.toMillis(60);
+        try
+        {
+            timerFrequency = TimeUnit.SECONDS.toMillis(Long.parseLong(Config.getInstance().getProperties().getProperty("reminderFrequency")));
+        } catch (NumberFormatException e)
+        {
+            LOGGER.error("Frequency provided by the config was invalid", e);
+        }
+        new Timer("Reminder Check").schedule(sendReminders, TimeUnit.SECONDS.toMillis(10), timerFrequency);
         LOGGER.info("Reminder Timer has been initiated");
     }
 

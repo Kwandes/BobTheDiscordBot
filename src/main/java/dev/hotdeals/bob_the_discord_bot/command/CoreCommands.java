@@ -135,7 +135,7 @@ public class CoreCommands extends ListenerAdapter
     {
         EmbedBuilder embed = new EmbedBuilder();
 
-        embed.setColor(new Color(0x6A2396)); // set color to purple
+        embed.setColor(MessageService.getEmbedColor()); // set color to purple
         embed.setAuthor(event.getJDA().getSelfUser().getAsTag(), "https://github.com/Kwandes/BobTheDiscordBot");
         embed.setThumbnail(event.getJDA().getSelfUser().getAvatarUrl());
         embed.setDescription("A Discord bot made in Java for learning purposes");
@@ -197,7 +197,7 @@ public class CoreCommands extends ListenerAdapter
     private void sendEmptyHelpMessage(MessageReceivedEvent event, String commandPrefix)
     {
         EmbedBuilder embed = new EmbedBuilder();
-        embed.setColor(new Color(0x6A2396)); // set color to purple
+        embed.setColor(MessageService.getEmbedColor()); // set color to purple
         embed.setTitle("Here are all the available commands:");
         embed.setFooter("Use " + commandPrefix + "help <command> for more information");
         List<List<Command>> commandList = getCommands();
@@ -226,7 +226,7 @@ public class CoreCommands extends ListenerAdapter
         List<Command> commandList = getCommandInformation(commandName);
         if (commandList.size() != 0)
         {
-            embed.setColor(new Color(0x6A2396)); // set color to purple
+            embed.setColor(MessageService.getEmbedColor()); // set color to purple
             embed.setDescription("Here is some commands related to \"" + commandName + "\":");
             for (Command command : commandList)
             {

@@ -30,17 +30,33 @@ CREATE TABLE IF NOT EXISTS discord.prefix (
 -- Contains reminders sent to the users at a specified time
 CREATE TABLE IF NOT EXISTS discord.reminder (
     id       INT AUTO_INCREMENT NOT NULL,
-    user_id  TEXT,
+    user_id  VARCHAR(64),
     datetime VARCHAR(32),
     reminder TEXT,
     status   VARCHAR(8),
     CONSTRAINT ph_reminder PRIMARY KEY (id)
 );
 
+-- Contains properties that the application uses to function
+CREATE TABLE IF NOT EXISTS discord.config (
+    id       INT AUTO_INCREMENT NOT NULL,
+    activity VARCHAR(256),
+    defaultCommandPrefix VARCHAR(8),
+    embedColor VARCHAR(8),
+    embedErrorColor   VARCHAR(8),
+    monitoringChannel   VARCHAR(64),
+    botTokenVarName VARCHAR(64),
+    reminderFrequency VARCHAR(8),
+    CONSTRAINT ph_config PRIMARY KEY (id)
+);
+-- Default config values: 
+INSERT INTO config (activity, defaultCommandPrefix, embedColor, embedErrorColor, monitoringChannel, botTokenVarName, reminderFrequency)
+VALUES ('Developing Sentience', '!', '0x6A2396', '0xff0000', '744373907255197747', 'BOB_THE_DISCORD_BOT_TOKEN', '60');
+
 -- Contains changes done to the tables in this schema. Used by the triggers
 CREATE TABLE IF NOT EXISTS discord.log (
     id         INT AUTO_INCREMENT NOT NULL,
-    user_id    TEXT,
+    user_id    VARCHAR(64),
     action     VARCHAR(10),
     table_name VARCHAR(15),
     log_time   DATETIME(6),
