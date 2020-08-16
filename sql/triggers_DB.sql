@@ -86,6 +86,46 @@ BEGIN
 END;
 
 -- -----------------------------------------------------
+-- Table discord.config
+-- -----------------------------------------------------
+CREATE TRIGGER tr_discord_config_ins
+    AFTER INSERT
+    ON discord.config
+    FOR EACH ROW
+    INSERT INTO discord.log(user_id, action, table_name, log_time, data)
+    VALUES (USER(),
+            'insert',
+            'config',
+            CURRENT_TIME(6),
+            CONCAT(NEW.activity, ' | ', NEW.defaultCommandPrefix, ' | ', NEW.embedColor, ' | ', NEW.embedErrorColor, ' | ', NEW.monitoringChannel, ' | ', NEW.botTokenVarName, ' | ', NEW.reminderFrequency));
+
+CREATE TRIGGER tr_discord_config_upd
+    BEFORE UPDATE
+    ON discord.config
+    FOR EACH ROW
+BEGIN
+    INSERT INTO discord.log(user_id, action, table_name, log_time, data)
+    VALUES (USER(),
+            'update',
+            'config',
+            CURRENT_TIME(6),
+            CONCAT(NEW.activity, ' | ', NEW.defaultCommandPrefix, ' | ', NEW.embedColor, ' | ', NEW.embedErrorColor, ' | ', NEW.monitoringChannel, ' | ', NEW.botTokenVarName, ' | ', NEW.reminderFrequency));
+END;
+
+CREATE TRIGGER tr_discord_config_del
+    BEFORE DELETE
+    ON discord.config
+    FOR EACH ROW
+BEGIN
+    INSERT INTO discord.log(user_id, action, table_name, log_time, data)
+    VALUES (USER(),
+            'delete',
+            'config',
+            CURRENT_TIME(6),
+            CONCAT(OLD.activity, ' | ', OLD.defaultCommandPrefix, ' | ', OLD.embedColor, ' | ', OLD.embedErrorColor, ' | ', OLD.monitoringChannel, ' | ', OLD.botTokenVarName, ' | ', OLD.reminderFrequency));
+END;
+
+-- -----------------------------------------------------
 -- Table discord.reminder
 -- -----------------------------------------------------
 CREATE TRIGGER tr_discord_reminder_ins
