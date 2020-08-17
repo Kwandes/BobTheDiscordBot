@@ -19,7 +19,6 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -76,10 +75,16 @@ public class CoreCommands extends ListenerAdapter
             case "remind":
             case "reminder":
                 ReminderCommand.processReminderCommand(event);
+                break;
             case "reload":
             case "reset":
             case "restart":
                 AdministrationCommands.restartBot(event.getChannel());
+                break;
+            case "throw":
+            case "throwLogs":
+                AdministrationCommands.throwLogs(event.getChannel());
+                break;
             case "":
             default:
                 // do nothing, such command doesn't exist / is invalid

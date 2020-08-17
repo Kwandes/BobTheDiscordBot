@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LogEvent;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -129,6 +130,32 @@ public class MessageService
             {
                 LOGGER.warn("The provided channel ID was invalid", e);
             }
+        }
+    }
+
+    /**
+     * Sends a log message to the monitoring channel
+     *
+     * @param logEvent the log to be sent
+     */
+    public static void sendLogMessage(LogEvent logEvent)
+    {
+        Config config = BobTheDiscordBot.getConfig();
+        JDA jda = BobTheDiscordBot.getJda();
+        if (!config.getProperties().getProperty("monitoringChannel").isEmpty())
+        {
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.setColor(getEmbedErrorColor());
+            embed.setTitle("[" + logEvent.getLevel().toString() + "]");
+            if (logEvent.getMessage().getThrowable() != null)
+            {
+                embed.setDescription(logEvent.getMessage().getFormattedMessage() + " - " + logEvent.getMessage().getThrowable().getMessage());
+            } else
+                embed.setDescription(logEvent.getMessage().getFormattedMessage());
+            embed.setFooter(LocalDateTime.now().toString());
+            TextChannel monitoringChannel = jda.getTextChannelById(config.getProperties().getProperty("monitoringChannel"));
+            if (monitoringChannel != null)
+                monitoringChannel.sendMessage(embed.build()).queue();
         }
     }
 

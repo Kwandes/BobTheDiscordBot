@@ -65,4 +65,22 @@ public class AdministrationCommands
         ReminderCommand.cancelReminderTimer();
         BobTheDiscordBot.getJda().shutdown();
     }
+
+    @Command(name = "throwLogs", aliases = {"throw"}, description = "Sends out all log types", structure = "throwLogs")
+    public static void throwLogs(MessageChannel channel)
+    {
+        LOGGER.trace("Throwing trace log");
+        LOGGER.debug("Throwing debug log");
+        LOGGER.info("Throwing info log");
+        LOGGER.warn("Throwing warn log");
+        LOGGER.error("Throwing error log");
+        try
+        {
+            throw new Exception("Throwing a custom exception");
+        } catch (Exception e)
+        {
+            LOGGER.error("Throwing error log, with exception", e);
+        }
+        MessageService.sendEmbedMessage(channel, "All logs have been sent out");
+    }
 }
