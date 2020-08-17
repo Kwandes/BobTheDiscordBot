@@ -1,7 +1,9 @@
 package dev.hotdeals.bob_the_discord_bot.command;
 
+import dev.hotdeals.bob_the_discord_bot.BobTheDiscordBot;
 import dev.hotdeals.bob_the_discord_bot.Service.MessageService;
 import dev.hotdeals.bob_the_discord_bot.repository.PrefixRepo;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,5 +55,14 @@ public class AdministrationCommands
             MessageService.sendEmbedMessage(event.getChannel(), "Prefix has been set to " + commandPrefix);
             CoreCommands.setGuildPrefixes(PrefixRepo.fetchPrefixes()); // refresh the list
         }
+    }
+
+    @Command(name = "restart", aliases = {"reload", "reset"}, description = "Restarts the bot", structure = "restart")
+    public static void restartBot(MessageChannel channel)
+    {
+        MessageService.sendEmbedMessage(channel, "The bot will restart now. It might take up to 5 minutes for it to come back online");
+        LOGGER.warn("The bot was ordered to restart");
+        ReminderCommand.cancelReminderTimer();
+        BobTheDiscordBot.getJda().shutdown();
     }
 }

@@ -76,6 +76,10 @@ public class CoreCommands extends ListenerAdapter
             case "remind":
             case "reminder":
                 ReminderCommand.processReminderCommand(event);
+            case "reload":
+            case "reset":
+            case "restart":
+                AdministrationCommands.restartBot(event.getChannel());
             case "":
             default:
                 // do nothing, such command doesn't exist / is invalid

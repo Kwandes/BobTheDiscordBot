@@ -19,6 +19,9 @@ import org.apache.logging.log4j.Logger;
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 public class BobTheDiscordBot
 {
@@ -29,6 +32,20 @@ public class BobTheDiscordBot
     private static JDA jda = null;
 
     public static void main(String[] args)
+    {
+        LOGGER.info("Initializing the bot startup procedure");
+        try
+        {
+            runBot();
+        } catch (Exception e)
+        {
+            LOGGER.error("An unexpected exception occurred during bot runtime", e);
+        }
+
+        startBotCheckTimer();
+    }
+
+    public static void runBot()
     {
         setupConfig();
 
@@ -112,6 +129,32 @@ public class BobTheDiscordBot
             LOGGER.fatal("Failed to initialize the application config. CLosing the application", e);
             System.exit(40); // 40 - failed to initialize the config
         }
+    }
+
+    /**
+     * Checks the JDA status and re-runs it, if needed
+     */
+    private static void startBotCheckTimer()
+    {
+        TimerTask checkBotStatus = new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                if (jda == null || !jda.getStatus().equals(JDA.Status.CONNECTED))
+                {
+                    LOGGER.warn("The JDA was null, starting the bot");
+                    runBot();
+                }else if ( !jda.getStatus().equals(JDA.Status.CONNECTED))
+                {
+                    LOGGER.warn("The JDA is not connected, status: " + jda.getStatus().toString());
+                    LOGGER.info("Starting the bot");
+                    runBot();
+                }
+            }
+        };
+
+        new Timer("checkBotStatus").schedule(checkBotStatus, TimeUnit.SECONDS.toMillis(60), TimeUnit.MINUTES.toMillis(5));
     }
 
     public static Config getConfig()

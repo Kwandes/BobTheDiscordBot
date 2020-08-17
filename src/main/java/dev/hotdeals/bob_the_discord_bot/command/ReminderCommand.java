@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 public class ReminderCommand
 {
     private static final Logger LOGGER = LogManager.getLogger(MethodHandles.lookup().lookupClass());
+    private static Timer timer = null;
 
     public static void processReminderCommand(MessageReceivedEvent event)
     {
@@ -90,8 +91,15 @@ public class ReminderCommand
         {
             LOGGER.error("Frequency provided by the config was invalid", e);
         }
-        new Timer("Reminder Check").schedule(sendReminders, TimeUnit.SECONDS.toMillis(10), timerFrequency);
+        timer = new Timer("Reminder Check");
+        timer.schedule(sendReminders, TimeUnit.SECONDS.toMillis(10), timerFrequency);
         LOGGER.info("Reminder Timer has been initiated");
+    }
+
+    public static void cancelReminderTimer()
+    {
+        timer.cancel();
+        LOGGER.info("Reminder timer has been canceled");
     }
 
     @Command(name = "reminder", aliases = {"remind", "remindme"}, description = "Sends a reminder via a private message after the specified period", structure = "reminder <time period> <message>")
