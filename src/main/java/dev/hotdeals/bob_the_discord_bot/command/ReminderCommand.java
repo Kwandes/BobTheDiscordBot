@@ -111,20 +111,21 @@ public class ReminderCommand
 
     public static void sendReminder(Reminder reminder)
     {
-        User user = BobTheDiscordBot.getJda().getUserById(reminder.getUserId());
-        if (user == null)
-        {
-            LOGGER.warn("Failed to find a user " + reminder.getUserId() + ". Reminder " + reminder.getReminderId() + " has not been sent");
-        } else
-        {
-            if (MessageService.sendPrivateMessage(user, "You've asked me to remind you: `" + reminder.getReminder() + "`"))
+        BobTheDiscordBot.getJda().retrieveUserById(reminder.getUserId()).queue(user -> {
+            if (user == null)
             {
-                LOGGER.info("Reminder has been sent: " + reminder);
+                LOGGER.warn("Failed to find user " + reminder.getUserId() + ". Reminder " + reminder.getReminderId() + " has not been sent");
             } else
             {
-                LOGGER.warn("Failed to send a reminder to " + reminder.getUserId());
+                if (MessageService.sendPrivateMessage(user, "You've asked me to remind you: `" + reminder.getReminder() + "`"))
+                {
+                    LOGGER.info("Reminder has been sent: " + reminder);
+                } else
+                {
+                    LOGGER.warn("Failed to send a reminder to " + reminder.getUserId());
+                }
             }
-        }
+        });
     }
 
     public static void deactivateReminder(Reminder reminder)

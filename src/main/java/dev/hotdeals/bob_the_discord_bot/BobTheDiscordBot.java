@@ -13,6 +13,8 @@ import dev.hotdeals.bob_the_discord_bot.repository.PrefixRepo;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -86,6 +88,8 @@ public class BobTheDiscordBot
 
             jda = JDABuilder.createDefault(botToken)
                     .setActivity(Activity.playing(displayedActivity))
+                    .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                    .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .build();
             jda.awaitReady(); // Blocking guarantees that JDA will be completely loaded.
             LOGGER.info("JDA has finished loading and has successfully logged in");
@@ -145,7 +149,7 @@ public class BobTheDiscordBot
                 {
                     LOGGER.warn("The JDA was null, starting the bot");
                     runBot();
-                }else if ( !jda.getStatus().equals(JDA.Status.CONNECTED))
+                } else if (!jda.getStatus().equals(JDA.Status.CONNECTED))
                 {
                     LOGGER.warn("The JDA is not connected, status: " + jda.getStatus().toString());
                     LOGGER.info("Starting the bot");
