@@ -56,7 +56,8 @@ public class CoreCommands extends ListenerAdapter
                 sendPing(event);
                 break;
             case "prefix":
-                AdministrationCommands.handlePrefix(event);
+                if (RankCommand.isAdministrator(event))
+                    AdministrationCommands.handlePrefix(event);
                 break;
             case "status":
                 sendStatusMessage(event, commandPrefix);
@@ -79,11 +80,18 @@ public class CoreCommands extends ListenerAdapter
             case "reload":
             case "reset":
             case "restart":
-                AdministrationCommands.restartBot(event.getChannel());
+                if (RankCommand.isDeveloper(event))
+                    AdministrationCommands.restartBot(event.getChannel());
                 break;
             case "throw":
             case "throwLogs":
-                AdministrationCommands.throwLogs(event.getChannel());
+                if (RankCommand.isDeveloper(event))
+                    AdministrationCommands.throwLogs(event.getChannel());
+                break;
+            case "cr":
+            case "changeRank":
+                if (RankCommand.isAdministrator(event))
+                    RankCommand.changeRank(event);
                 break;
             case "":
             default:
@@ -285,6 +293,7 @@ public class CoreCommands extends ListenerAdapter
         Class<? extends TagCommands> tagCommands = TagCommands.class;
         Class<? extends AdministrationCommands> adminCommands = AdministrationCommands.class;
         Class<? extends ReminderCommand> reminderCommand = ReminderCommand.class;
+        Class<? extends RankCommand> rankCommand = RankCommand.class;
 
         List<List<Method>> methods = new ArrayList<>();
 
@@ -292,6 +301,7 @@ public class CoreCommands extends ListenerAdapter
         methods.add(Arrays.asList(tagCommands.getDeclaredMethods()));
         methods.add(Arrays.asList(adminCommands.getDeclaredMethods()));
         methods.add(Arrays.asList(reminderCommand.getDeclaredMethods()));
+        methods.add(Arrays.asList(rankCommand.getDeclaredMethods()));
 
         List<List<Command>> commands = new ArrayList<>();
         for (List<Method> methodList : methods)

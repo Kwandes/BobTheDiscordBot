@@ -86,6 +86,46 @@ BEGIN
 END;
 
 -- -----------------------------------------------------
+-- Table discord.reminder
+-- -----------------------------------------------------
+CREATE TRIGGER tr_discord_reminder_ins
+    AFTER INSERT
+    ON discord.reminder
+    FOR EACH ROW
+    INSERT INTO discord.log(user_id, action, table_name, log_time, data)
+    VALUES (USER(),
+            'insert',
+            'reminder',
+            CURRENT_TIME(6),
+            CONCAT(NEW.user_id, ' | ', NEW.datetime, ' | ', NEW.reminder, ' | ', New.reminder));
+
+CREATE TRIGGER tr_discord_reminder_upd
+    BEFORE UPDATE
+    ON discord.reminder
+    FOR EACH ROW
+BEGIN
+    INSERT INTO discord.log(user_id, action, table_name, log_time, data)
+    VALUES (USER(),
+            'update',
+            'reminder',
+            CURRENT_TIME(6),
+            CONCAT(NEW.user_id, ' | ', NEW.datetime, ' | ', NEW.reminder, ' | ', New.reminder));
+END;
+
+CREATE TRIGGER tr_discord_reminder_del
+    BEFORE DELETE
+    ON discord.reminder
+    FOR EACH ROW
+BEGIN
+    INSERT INTO discord.log(user_id, action, table_name, log_time, data)
+    VALUES (USER(),
+            'delete',
+            'reminder',
+            CURRENT_TIME(6),
+            CONCAT(OLD.user_id, ' | ', OLD.datetime, ' | ', OLD.reminder, ' | ', OLD.status));
+END;
+
+-- -----------------------------------------------------
 -- Table discord.config
 -- -----------------------------------------------------
 CREATE TRIGGER tr_discord_config_ins
@@ -126,43 +166,43 @@ BEGIN
 END;
 
 -- -----------------------------------------------------
--- Table discord.reminder
+-- Table discord.userRank
 -- -----------------------------------------------------
-CREATE TRIGGER tr_discord_reminder_ins
+CREATE TRIGGER tr_discord_userRank_ins
     AFTER INSERT
-    ON discord.reminder
+    ON discord.userRank
     FOR EACH ROW
     INSERT INTO discord.log(user_id, action, table_name, log_time, data)
     VALUES (USER(),
             'insert',
-            'reminder',
+            'userRank',
             CURRENT_TIME(6),
-            CONCAT(NEW.user_id, ' | ', NEW.datetime, ' | ', NEW.reminder, ' | ', New.reminder));
+            CONCAT(NEW.userId, ' | ', NEW.guildId, ' | ', NEW.userRank));
 
-CREATE TRIGGER tr_discord_reminder_upd
+CREATE TRIGGER tr_discord_userRank_upd
     BEFORE UPDATE
-    ON discord.reminder
+    ON discord.userRank
     FOR EACH ROW
 BEGIN
     INSERT INTO discord.log(user_id, action, table_name, log_time, data)
     VALUES (USER(),
             'update',
-            'reminder',
+            'userRank',
             CURRENT_TIME(6),
-            CONCAT(NEW.user_id, ' | ', NEW.datetime, ' | ', NEW.reminder, ' | ', New.reminder));
+            CONCAT(NEW.userId, ' | ', NEW.guildId, ' | ', NEW.userRank));
 END;
 
-CREATE TRIGGER tr_discord_reminder_del
+CREATE TRIGGER tr_discord_userRank_del
     BEFORE DELETE
-    ON discord.reminder
+    ON discord.userRank
     FOR EACH ROW
 BEGIN
     INSERT INTO discord.log(user_id, action, table_name, log_time, data)
     VALUES (USER(),
             'delete',
-            'reminder',
+            'userRank',
             CURRENT_TIME(6),
-            CONCAT(OLD.user_id, ' | ', OLD.datetime, ' | ', OLD.reminder, ' | ', OLD.status));
+            CONCAT(OLD.userId, ' | ', OLD.guildId, ' | ', OLD.userRank));
 END;
 
 

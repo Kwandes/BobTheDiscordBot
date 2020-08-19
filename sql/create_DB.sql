@@ -49,9 +49,21 @@ CREATE TABLE IF NOT EXISTS discord.config (
     reminderFrequency VARCHAR(8),
     CONSTRAINT ph_config PRIMARY KEY (id)
 );
--- Default config values: 
+-- Default config values:
 INSERT INTO config (activity, defaultCommandPrefix, embedColor, embedErrorColor, monitoringChannel, botTokenVarName, reminderFrequency)
 VALUES ('Developing Sentience', '!', '0x6A2396', '0xff0000', '744373907255197747', 'BOB_THE_DISCORD_BOT_TOKEN', '60');
+
+-- Contains users and their guild-specific permissions. Developer is not guild-specific
+CREATE TABLE IF NOT EXISTS discord.userRank (
+    id       INT AUTO_INCREMENT NOT NULL,
+    userId VARCHAR(64) NOT NULL,
+    guildId VARCHAR(64) DEFAULT NULL,
+    userRank VARCHAR(13),   -- Administrator, Developer
+    CONSTRAINT ph_userRank PRIMARY KEY (id)
+);
+-- Default rank values:
+INSERT INTO userRank (userId, guildId, userRank)
+VALUES ('232921997514899457', null, 'Developer');
 
 -- Contains changes done to the tables in this schema. Used by the triggers
 CREATE TABLE IF NOT EXISTS discord.log (
