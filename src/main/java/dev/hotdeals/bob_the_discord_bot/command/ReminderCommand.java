@@ -71,7 +71,6 @@ public class ReminderCommand
             @Override
             public void run()
             {
-                LOGGER.debug("Checking reminders");
                 ArrayList<Reminder> reminderList = ReminderRepo.fetchReminders();
                 for (Reminder reminder : reminderList)
                 {
