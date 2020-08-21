@@ -42,11 +42,10 @@ public class Config
         if (properties.isEmpty())
         {
             LOGGER.warn("Properties loaded from the database were empty. Loading config.properties instead");
-            FileInputStream fi = new FileInputStream("src/main/resources/" + configFileName);
-            this.properties.load(fi);
-            fi.close();
+            this.properties.load(this.getClass().getResourceAsStream("/" + configFileName));
             LOGGER.debug("The config.properties file has been loaded");
         }
+        LOGGER.info("Properties: " + properties.toString());
         LOGGER.debug("Retrieving and assigning environment variables");
         setEnvVariables();
         LOGGER.debug("Environment variables have been loaded and set");
@@ -56,8 +55,14 @@ public class Config
     private void setEnvVariables() throws NullPointerException
     {
         LOGGER.debug("Processing the bot token env variable");
-        String botToken = System.getenv(getProperties().getProperty("botToken"));
-        this.properties.setProperty("botToken", botToken);
+        try
+        {
+            String botToken = System.getenv(getProperties().getProperty("botToken"));
+            this.properties.setProperty("botToken", botToken);
+        } catch (NullPointerException e)
+        {
+            LOGGER.error("Failed to load environment variables!", e);
+        }
     }
 
     public Properties getProperties()

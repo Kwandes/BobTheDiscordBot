@@ -17,8 +17,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.awt.Color;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -104,27 +103,29 @@ public class MessageService
             try
             {
                 TextChannel monitoringChannel = jda.getTextChannelById(config.getProperties().getProperty("monitoringChannel"));
+
                 if (monitoringChannel != null)
                 {
-                    try (FileReader fr = new FileReader("pom.xml"))
+                    String buildVersion = "N/A";
+                    String jdaVersion = "N/A";
+                    String javaVersion = "N/A";
+                    Model model = getPomModel();
+                    if (model != null)
                     {
-                        MavenXpp3Reader reader = new MavenXpp3Reader();
-                        Model model = reader.read(fr);
-                        String buildVersion = model.getVersion();
-                        String jdaVersion = model.getDependencies().get(0).getVersion();
-                        String javaVersion = model.getProperties().getProperty("maven.compiler.source");
-                        EmbedBuilder embed = new EmbedBuilder();
-                        embed.setTitle("The bot has booted up");
-                        if (jda.getPresence().getActivity() != null)
-                            embed.setDescription(jda.getPresence().getActivity().getName() + "!");
-                        embed.addField("Build Info", "```fix\nVersion: " + buildVersion + "\nJDA: " + jdaVersion + "\nJava: " + javaVersion + "```", false);
-                        embed.setFooter(LocalDateTime.now().toString());
-                        embed.setColor(MessageService.getEmbedColor());
-                        MessageService.sendMessage(monitoringChannel, embed.build());
-                    } catch (IOException | XmlPullParserException e)
-                    {
-                        LOGGER.error("An error occurred during parsing of the pom.xml data", e);
-                    }
+                        buildVersion = model.getVersion();
+                        jdaVersion = model.getDependencies().get(0).getVersion();
+                        javaVersion = model.getProperties().getProperty("maven.compiler.source");
+                    } else
+                        LOGGER.warn("Failed to read the pom file");
+
+                    EmbedBuilder embed = new EmbedBuilder();
+                    embed.setTitle("The bot has booted up");
+                    if (jda.getPresence().getActivity() != null)
+                        embed.setDescription(jda.getPresence().getActivity().getName() + "!");
+                    embed.addField("Build Info", "```fix\nVersion: " + buildVersion + "\nJDA: " + jdaVersion + "\nJava: " + javaVersion + "```", false);
+                    embed.setFooter(LocalDateTime.now().toString());
+                    embed.setColor(MessageService.getEmbedColor());
+                    MessageService.sendMessage(monitoringChannel, embed.build());
                 } else LOGGER.warn("The monitoring channel is not valid!");
             } catch (NumberFormatException e)
             {
@@ -218,5 +219,25 @@ public class MessageService
             LOGGER.warn("Failed to parse embed Error color from the config");
         }
         return color;
+    }
+
+    public static Model getPomModel()
+    {
+        try
+        {
+            Model model;
+            InputStream stream;
+            if ((new File("pom.xml")).exists())
+                stream = new FileInputStream("pom.xml");
+            else
+                stream = MessageService.class.getResourceAsStream("/META-INF/maven/dev.hotdeals/bob_the_discord_bot/pom.xml");
+            model = new MavenXpp3Reader().read(stream);
+            stream.close();
+            return model;
+        } catch (XmlPullParserException | IOException e)
+        {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

@@ -8,7 +8,6 @@ package dev.hotdeals.bob_the_discord_bot.config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
@@ -39,10 +38,8 @@ public class JdbcConfig
 
     public void loadProperties() throws IOException
     {
-        properties = new Properties();
-        FileInputStream fi = new FileInputStream("src/main/resources/" + configFileName);
-        properties.load(fi);
-        fi.close();
+        this.properties = new Properties();
+        this.properties.load(this.getClass().getResourceAsStream("/" + configFileName));
         LOGGER.debug("The config.properties file has been loaded");
     }
 

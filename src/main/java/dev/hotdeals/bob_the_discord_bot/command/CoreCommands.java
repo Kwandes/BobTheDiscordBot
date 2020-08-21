@@ -15,12 +15,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.FileReader;
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
@@ -183,17 +179,14 @@ public class CoreCommands extends ListenerAdapter
         String javaVersion = "N/A";
 
         // get project information from the maven pom.xml file
-        try (FileReader fr = new FileReader("pom.xml"))
+        Model model = MessageService.getPomModel();
+        if (model != null)
         {
-            MavenXpp3Reader reader = new MavenXpp3Reader();
-            Model model = reader.read(fr);
             buildVersion = model.getVersion();
             jdaVersion = model.getDependencies().get(0).getVersion();
             javaVersion = model.getProperties().getProperty("maven.compiler.source");
-        } catch (IOException | XmlPullParserException e)
-        {
-            LOGGER.error("An error occurred during parsing of the pom.xml data", e);
-        }
+        } else
+            LOGGER.warn("Failed to read the pom file");
 
         embed.addField("Build Info", "```fix\nVersion: " + buildVersion + "\nJDA: " + jdaVersion + "\nJava: " + javaVersion + "```", false);
         embed.addField("Source", "[github.com/Kwandes](https://github.com/Kwandes/BobTheDiscordBot)", false);
