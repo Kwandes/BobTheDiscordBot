@@ -34,7 +34,9 @@ public class MessageTest
                 Arguments.of("", -1, new String[]{""}),
                 Arguments.of("!Foo arg1 Arg2", 2, new String[]{"!foo", "arg1 Arg2"}),
                 Arguments.of("!Foo arg1 arg2", 1, new String[]{"!foo arg1 arg2"}),
-                Arguments.of("!FOO ARG1 ARG2 ARG3", 2, new String[]{"!foo", "ARG1 ARG2 ARG3"})
+                Arguments.of("!foo \narg1 arg2 \narg3", 3, new String[]{"!foo", "arg1", "arg2 \narg3"}),
+                Arguments.of("!foo\narg1 arg2\narg3", 3, new String[]{"!foo", "arg1", "arg2\narg3"}),
+                Arguments.of("!FOO ARG1 ARG2\nARG3 arg4 arg5 arg6", 2, new String[]{"!foo", "ARG1 ARG2\nARG3 arg4 arg5 arg6"})
         );
     }
 

@@ -172,7 +172,7 @@ public class MessageService
     public static List<String> formatMessageArguments(String message, int argumentCount)
     {
         if (argumentCount < 1) argumentCount = 1;
-        List<String> splitMessage = new ArrayList<>(Arrays.asList(message.split(" ")));
+        List<String> splitMessage = new ArrayList<>(Arrays.asList(message.split("[\\s\\n]+", argumentCount)));
         for (int i = 0; i < splitMessage.size(); i++)
         {
             if (i >= argumentCount)
