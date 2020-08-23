@@ -1,3 +1,5 @@
+# Dockerfile for creation of images on the x64 platform (windows 10 etc)
+# The images are not compatible with raspberry pi and ARM architecture! For that use the docker/Dockerfile one
 FROM maven:3.6.3-jdk-11 AS MAVEN_BUILD
 
 COPY ./ ./

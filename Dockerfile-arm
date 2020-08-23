@@ -1,0 +1,11 @@
+# Dockerfile for creation of images on the raspberry pi platform (ARM architecture)
+FROM arm32v7/maven:3.6.3-adoptopenjdk-11 AS MAVEN_BUILD
+
+COPY ./ ./
+
+FROM arm32v7/openjdk:11-jre
+
+COPY --from=MAVEN_BUILD docker/bob_the_discord_bot-*.jar /discord.jar
+RUN chmod +x /discord.jar
+
+CMD ["java", "-jar", "/discord.jar"]

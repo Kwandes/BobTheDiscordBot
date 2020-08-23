@@ -24,6 +24,10 @@ Navigate over to the program directory and run:
 ```
 docker build -t discord-bot-X.X.X .
 ```
+For raspberry Pi and ARM architecture compatibility use **Dockerfile-arm**
+```
+docker build -t discord-bot-X.X.X -f Dockerfile-arm .
+```
 
 This will compile the project and create an image.
 After that you can start the image with:
