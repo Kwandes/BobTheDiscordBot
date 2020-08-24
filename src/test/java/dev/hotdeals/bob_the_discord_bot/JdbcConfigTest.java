@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class JdbcConfigTest
 {
+    /*
     @Test
     @BeforeAll
     @Order(1)
@@ -29,4 +30,5 @@ public class JdbcConfigTest
         Properties properties = Config.getInstance().getProperties();
         assertFalse(properties.isEmpty(), "The properties file has failed to load");
     }
+    */
 }
