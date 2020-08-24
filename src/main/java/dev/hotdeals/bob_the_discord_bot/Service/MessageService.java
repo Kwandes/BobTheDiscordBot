@@ -84,6 +84,21 @@ public class MessageService
             return false;
         }
     }
+    public static boolean sendPrivateMessage(User user, MessageEmbed embed)
+    {
+        try
+        {
+            user.openPrivateChannel().queue((privateChannel) ->
+                    privateChannel.sendMessage(embed).queue());
+            LOGGER.debug("Private Message Embed sent to " + user);
+            return true;
+        } catch (ErrorResponseException e)
+        {
+            LOGGER.error("Private message Embed has failed to send", e);
+            return false;
+        }
+    }
+
 
     public static boolean sendErrorMessage(MessageChannel channel, String message)
     {

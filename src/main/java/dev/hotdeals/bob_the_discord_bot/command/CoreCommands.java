@@ -73,6 +73,22 @@ public class CoreCommands extends ListenerAdapter
             case "reminder":
                 ReminderCommand.processReminderCommand(event);
                 break;
+            case "message":
+            case "msg":
+            case "dm":
+            case "sendmessage":
+                if (RankCommand.isAdministrator(event))
+                    MessageCommand.sendMessage(event);
+                break;
+            case "sendembed":
+            case "messageembed":
+            case "msgembed":
+            case "dmembed":
+            case "embed":
+            case "sendembedmessage":
+                if (RankCommand.isAdministrator(event))
+                    MessageCommand.sendEmbedMessage(event);
+                break;
             case "reload":
             case "reset":
             case "restart":
@@ -80,12 +96,12 @@ public class CoreCommands extends ListenerAdapter
                     AdministrationCommands.restartBot(event.getChannel());
                 break;
             case "throw":
-            case "throwLogs":
+            case "throwlogs":
                 if (RankCommand.isDeveloper(event))
                     AdministrationCommands.throwLogs(event.getChannel());
                 break;
             case "cr":
-            case "changeRank":
+            case "changerank":
                 if (RankCommand.isAdministrator(event))
                     RankCommand.changeRank(event);
                 break;
@@ -274,7 +290,7 @@ public class CoreCommands extends ListenerAdapter
             for (Command command : commandList)
                 try
                 {
-                    if (command.name().contains(commandName) ||
+                    if (command.name().toLowerCase().contains(commandName.toLowerCase()) ||
                             Arrays.asList(command.aliases()).contains(commandName))
                     {
                         matchingCommands.add(command);
@@ -298,6 +314,7 @@ public class CoreCommands extends ListenerAdapter
         Class<? extends AdministrationCommands> adminCommands = AdministrationCommands.class;
         Class<? extends ReminderCommand> reminderCommand = ReminderCommand.class;
         Class<? extends RankCommand> rankCommand = RankCommand.class;
+        Class<? extends MessageCommand> messageCommand = MessageCommand.class;
 
         List<List<Method>> methods = new ArrayList<>();
 
@@ -306,6 +323,7 @@ public class CoreCommands extends ListenerAdapter
         methods.add(Arrays.asList(adminCommands.getDeclaredMethods()));
         methods.add(Arrays.asList(reminderCommand.getDeclaredMethods()));
         methods.add(Arrays.asList(rankCommand.getDeclaredMethods()));
+        methods.add(Arrays.asList(messageCommand.getDeclaredMethods()));
 
         List<List<Command>> commands = new ArrayList<>();
         for (List<Method> methodList : methods)
