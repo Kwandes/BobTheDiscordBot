@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS discord.config (
 );
 -- Default config values:
 INSERT INTO config (activity, defaultCommandPrefix, embedColor, embedErrorColor, monitoringChannel, botTokenVarName, reminderFrequency)
-VALUES ('Developing Sentience', '!', '0x6A2396', '0xff0000', '744373907255197747', 'BOB_THE_DISCORD_BOT_TOKEN', '60');
+VALUES ('Developing Sentience', '!', '0x6A2396', '0xff0000', '744373907255197747', 'DISCORD_BOT_TOKEN', '60');
 
 -- Contains users and their guild-specific permissions. Developer is not guild-specific
 CREATE TABLE IF NOT EXISTS discord.userRank (

@@ -40,12 +40,21 @@ public class JdbcConfig
     {
         this.properties = new Properties();
         this.properties.load(this.getClass().getResourceAsStream("/" + configFileName));
-        LOGGER.debug("The config.properties file has been loaded");
+        LOGGER.debug("The JdbcConfig.properties file has been loaded");
+
+        LOGGER.debug("Processing the JDBC URL env variable");
+        try
+        {
+            String botToken = System.getenv(this.properties.getProperty("jdbcUrl"));
+            this.properties.setProperty("jdbcUrl", botToken);
+        } catch (NullPointerException e)
+        {
+            LOGGER.error("Failed to load jdbc environment variables!", e);
+        }
     }
 
     public Connection getConnection() throws SQLException
     {
-        return DriverManager.getConnection(properties.getProperty("jdbcUrl"),
-                this.properties.getProperty("jdbcUsername"), properties.getProperty("jdbcPassword"));
+        return DriverManager.getConnection(properties.getProperty("jdbcUrl"));
     }
 }

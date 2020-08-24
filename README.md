@@ -32,10 +32,12 @@ docker build -t discord-bot-X.X.X -f Dockerfile-arm .
 This will compile the project and create an image.
 After that you can start the image with:
  ```
- docker run --name discord-bot-X.X.X -e BOB_THE_DISCORD_BOT_TOKEN -d discord-bot-X.X.X
+ docker run --name discord-bot-X.X.X -e DISCORD_BOT_TOKEN -e DISCORD_BOT_JDBC_URL -d discord-bot-X.X.X
 ```
 
 *Make sure to you have a bot application token setup as an environment variable with that exact name, otherwise the bot will shutdown immediately.*
+
+*You also need a database connection url that includes the username and password, example is in the* **jdbc.properties file**
 
 ###License
 This Software is released under an [MIT license](https://opensource.org/licenses/MIT)
