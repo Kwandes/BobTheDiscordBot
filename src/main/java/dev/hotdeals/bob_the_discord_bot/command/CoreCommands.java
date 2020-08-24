@@ -34,8 +34,8 @@ public class CoreCommands extends ListenerAdapter
     public void onMessageReceived(@NotNull MessageReceivedEvent event)
     {
         if (event.getAuthor().isBot()) return;
+        if (!validateMessage(event)) return;
         String commandPrefix = findGuildCommandPrefix(event.getGuild().getId());
-        if (!validateMessage(event, commandPrefix)) return;
 
         LOGGER.debug(event.getGuild() + "/" + event.getChannel() + "/" + event.getAuthor() +
                 " called a command `" + event.getMessage().getContentRaw() + "`");
@@ -96,11 +96,27 @@ public class CoreCommands extends ListenerAdapter
     }
 
     //region Message processing
-    public boolean validateMessage(MessageReceivedEvent event, String commandPrefix)
+
+    /**
+     * Checks for message type and the test itself to validate whether or not to continue processing this event
+     *
+     * @param event the MessageReceived event to be validated
+     * @return whether or not to continue processing this event
+     */
+    public boolean validateMessage(MessageReceivedEvent event)
     {
         if (event.getAuthor().isBot()) return false;
-        return (checkMessageType(event.getMessage().getContentRaw(), commandPrefix,
-                event.getJDA().getSelfUser().getId(), event.getMessage().getChannelType()));
+
+        String guildId = "";
+        if (event.getChannelType() == ChannelType.TEXT) guildId = event.getGuild().getId();
+
+        return checkMessageType(event.getMessage().getContentRaw(), findGuildCommandPrefix(guildId), event.getJDA().getSelfUser().getId(), event.getChannelType());
+    }
+
+    public boolean checkMessageType(String message, String commandPrefix, String botId, ChannelType channelType)
+    {
+        if (channelType != ChannelType.TEXT) return false;
+        return (message.startsWith(commandPrefix) || message.equals("<@!" + botId + ">"));
     }
 
     public static String findGuildCommandPrefix(String guildID)
@@ -110,11 +126,6 @@ public class CoreCommands extends ListenerAdapter
         return prefix;
     }
 
-    public boolean checkMessageType(String message, String commandPrefix, String botId, ChannelType channelType)
-    {
-        if (channelType != ChannelType.TEXT) return false;
-        return (message.startsWith(commandPrefix) || message.equals("<@!" + botId + ">"));
-    }
 
     public String getFirstArgument(String message, String commandPrefix, String botId)
     {
