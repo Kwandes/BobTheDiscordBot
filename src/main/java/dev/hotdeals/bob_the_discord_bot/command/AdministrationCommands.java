@@ -27,9 +27,9 @@ public class AdministrationCommands
             return;
         }
 
-        if (splitMessage.get(1).length() > 3)
+        if (splitMessage.get(1).length() > 10)
         {
-            MessageService.sendErrorMessage(event.getChannel(), "New prefix is too long, max characters: 3, provided prefix: " + splitMessage.get(1).length());
+            MessageService.sendErrorMessage(event.getChannel(), "New prefix is too long, max characters: 10, provided prefix: " + splitMessage.get(1).length());
         } else
         {
             changePrefix(event, splitMessage.get(1), commandPrefix);

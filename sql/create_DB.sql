@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS discord.tag (
 CREATE TABLE IF NOT EXISTS discord.prefix (
     id       INT AUTO_INCREMENT NOT NULL,
     guild_id VARCHAR(64)        NOT NULL UNIQUE,
-    prefix   VARCHAR(3)         NOT NULL,
+    prefix   VARCHAR(10)         NOT NULL,
     CONSTRAINT pk_prefix PRIMARY KEY (id),
     CONSTRAINT uc_guild_id UNIQUE (guild_id)
 );
