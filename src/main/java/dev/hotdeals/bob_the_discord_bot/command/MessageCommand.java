@@ -51,7 +51,7 @@ public class MessageCommand
                 channelId = channelId.substring(3, channelId.length() - 1);
             }
 
-            MessageChannel channel = event.getJDA().getTextChannelById(channelId);
+            MessageChannel channel = event.getGuild().getTextChannelById(channelId);
             String message = splitMessage.get(2);
             MessageEmbed embed = new EmbedBuilder()
                     .setDescription(splitMessage.get(2))
