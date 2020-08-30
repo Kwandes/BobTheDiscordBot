@@ -84,6 +84,27 @@ public class TagRepo
         return false;
     }
 
+    public static boolean renameTag(String guildId, String tagName, String newTagName)
+    {
+        try (Connection connection = JdbcConfig.getInstance().getConnection())
+        {
+            PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE tag SET tag_name = ? WHERE guild_id = ? AND tag_name = ?");
+            statement.setString(1, newTagName);
+            statement.setString(2, guildId);
+            statement.setString(3, tagName);
+            return statement.executeUpdate() > 0;
+
+        } catch (SQLException e)
+        {
+            LOGGER.error("An error occurred while performing a query", e);
+        } catch (NullPointerException e)
+        {
+            LOGGER.error("Database connection is null, probably due to invalid configuration");
+        }
+        return false;
+    }
+
     public static boolean deleteTag(String guildId, String tagName)
     {
         try (Connection connection = JdbcConfig.getInstance().getConnection())

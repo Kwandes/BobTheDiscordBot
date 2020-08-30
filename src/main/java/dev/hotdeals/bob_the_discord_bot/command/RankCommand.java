@@ -38,7 +38,8 @@ public class RankCommand
             return;
         }
 
-        String userId = splitMessage.get(1);
+        String userId = MessageService.stripMentionSymbols(splitMessage.get(1));
+
         if (!userId.matches("^\\d{1,64}$"))
         {
             LOGGER.info("Provided user ID is invalid: " + userId);

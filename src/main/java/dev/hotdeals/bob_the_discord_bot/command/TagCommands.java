@@ -42,9 +42,13 @@ public class TagCommands
             case "edit":
                 tagEdit(event, splitMessage, commandPrefix);
                 break;
+            case "rename":
+                tagRename(event, commandPrefix);
+                break;
             case "remove":
                 tagRemove(event, splitMessage, commandPrefix);
                 break;
+            case "help":
             case "list":
                 tagList(event);
                 break;
@@ -136,7 +140,52 @@ public class TagCommands
         }
     }
 
-    @Command(name = "tag remove", aliases = {"t remove"}, description = "Remove a tag", structure = "tag remove <trigger>")
+    @Command(name = "tag rename", aliases = {"t rename"}, description = "Renames a tag while preserving its contents", structure = "tag rename <trigger> <newTrigger>")
+    private static void tagRename(MessageReceivedEvent event, String commandPrefix)
+    {
+        // passed split message gas only four arguments, with the fourth being combined remainder
+        // this command requires the last element to be a single word
+        List<String> splitMessage = MessageService.formatMessageArguments(event.getMessage().getContentRaw(), 5);
+
+        if (splitMessage.size() < 4)
+        {
+            LOGGER.debug("The command had too few parameters");
+            MessageService.sendErrorMessage(event.getChannel(), "The command has too few parameters! Use `" + commandPrefix + "help tag rename` to learn more");
+            return;
+        }
+
+        // check if the tag exists
+        if (!TagRepo.fetchTagsForGuild(event.getGuild().getId()).containsKey(splitMessage.get(2)))
+        {
+            LOGGER.debug("A tag with the name '" + splitMessage.get(2) + "' doesn't exist.");
+            MessageService.sendErrorMessage(event.getChannel(), "A tag with the name `" + splitMessage.get(2) + "` doesn't exist!");
+            return;
+        }
+
+        // validate input
+        if (splitMessage.get(2).length() > 100 || splitMessage.get(3).length() > 100)
+        {
+            LOGGER.debug("The provided tag name was too long. Max limit: 100");
+            MessageService.sendErrorMessage(event.getChannel(), "The provided tag name was too long. Max limit: `100`");
+        } else if (splitMessage.get(3).length() > 2000)
+        {
+            // technically impossible as a discord message can't be more than 2000 but if it changes in the future, it would break the query
+            LOGGER.debug("The provided tag content was too long. Max limit: 2000");
+            MessageService.sendErrorMessage(event.getChannel(), "The provided tag content was too long. Max limit: `2000`");
+        }
+
+        if (TagRepo.renameTag(event.getGuild().getId(), splitMessage.get(2), splitMessage.get(3)))
+        {
+            LOGGER.debug("Renamed an existing tag: " + event.getGuild().getId() + "/" + splitMessage.get(2) + " to " + splitMessage.get(3));
+            MessageService.sendEmbedMessage(event.getChannel(), "The tag has been renamed from `" + splitMessage.get(2) + "` to `" + splitMessage.get(3) + "`");
+        } else
+        {
+            LOGGER.debug("Failed to rename a tag: " + event.getGuild().getId() + "/" + splitMessage.get(2));
+            MessageService.sendErrorMessage(event.getChannel(), "Failed to rename a tag `" + splitMessage.get(2) + "`! Possible causes: issues with database connection");
+        }
+    }
+
+    @Command(name = "tag remove", aliases = {"t remove", "tag delete", "t delete"}, description = "Remove a tag", structure = "tag remove <trigger>")
     private static void tagRemove(MessageReceivedEvent event, List<String> splitMessage, String commandPrefix)
     {
         if (splitMessage.size() < 3)

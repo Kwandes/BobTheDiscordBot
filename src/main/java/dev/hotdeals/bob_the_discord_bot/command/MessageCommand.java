@@ -41,17 +41,9 @@ public class MessageCommand
         }
         try
         {
-            String channelId = splitMessage.get(1);
-            if (channelId.startsWith("<#") && channelId.endsWith(">"))
-            {
-                channelId = channelId.substring(2, channelId.length() - 1);
+            String channelId = MessageService.stripMentionSymbols(splitMessage.get(1));
 
-            } else if (channelId.startsWith("<@!") && channelId.endsWith(">"))
-            {
-                channelId = channelId.substring(3, channelId.length() - 1);
-            }
-
-            MessageChannel channel = event.getJDA().getTextChannelById(channelId);
+            MessageChannel channel = event.getGuild().getTextChannelById(channelId);
             String message = splitMessage.get(2);
             MessageEmbed embed = new EmbedBuilder()
                     .setDescription(splitMessage.get(2))
@@ -88,10 +80,15 @@ public class MessageCommand
                 });
                 return;
             }
+            boolean sentResult = false;
             if (embedMessage)
-                MessageService.sendMessage(channel, embed);
+                sentResult = MessageService.sendMessage(channel, embed);
             else
-                MessageService.sendMessage(channel, message);
+                sentResult = MessageService.sendMessage(channel, message);
+            if (sentResult)
+            {
+                MessageService.sendEmbedMessage(event.getChannel(), "Message has been sent to #" + channel.getName()+"");
+            }
         } catch (NumberFormatException e)
         {
             LOGGER.info("Provided channel was invalid");

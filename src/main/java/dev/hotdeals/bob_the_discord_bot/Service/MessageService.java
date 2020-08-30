@@ -210,6 +210,24 @@ public class MessageService
         return splitMessage;
     }
 
+    /**
+     * Removes <!*> and <#*> from IDs
+     * @param id ID to be formatted
+     * @return stripped ID
+     */
+    public static String stripMentionSymbols(String id)
+    {
+        if (id.startsWith("<#") && id.endsWith(">"))
+        {
+            id = id.substring(2, id.length() - 1);
+
+        } else if (id.startsWith("<@!") && id.endsWith(">"))
+        {
+            id = id.substring(3, id.length() - 1);
+        }
+        return id;
+    }
+
     public static Color getEmbedColor()
     {
         Color color = new Color(0x6A2396);
