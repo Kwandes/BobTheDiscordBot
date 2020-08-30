@@ -88,10 +88,15 @@ public class MessageCommand
                 });
                 return;
             }
+            boolean sentResult = false;
             if (embedMessage)
-                MessageService.sendMessage(channel, embed);
+                sentResult = MessageService.sendMessage(channel, embed);
             else
-                MessageService.sendMessage(channel, message);
+                sentResult = MessageService.sendMessage(channel, message);
+            if (sentResult)
+            {
+                MessageService.sendEmbedMessage(event.getChannel(), "Message has been sent to #" + channel.getName()+"");
+            }
         } catch (NumberFormatException e)
         {
             LOGGER.info("Provided channel was invalid");
