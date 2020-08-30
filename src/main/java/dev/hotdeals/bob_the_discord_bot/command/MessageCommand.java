@@ -41,15 +41,7 @@ public class MessageCommand
         }
         try
         {
-            String channelId = splitMessage.get(1);
-            if (channelId.startsWith("<#") && channelId.endsWith(">"))
-            {
-                channelId = channelId.substring(2, channelId.length() - 1);
-
-            } else if (channelId.startsWith("<@!") && channelId.endsWith(">"))
-            {
-                channelId = channelId.substring(3, channelId.length() - 1);
-            }
+            String channelId = MessageService.stripMentionSymbols(splitMessage.get(1));
 
             MessageChannel channel = event.getGuild().getTextChannelById(channelId);
             String message = splitMessage.get(2);
