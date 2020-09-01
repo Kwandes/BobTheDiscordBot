@@ -45,6 +45,7 @@ public class TagCommands
             case "rename":
                 tagRename(event, commandPrefix);
                 break;
+            case "delete":
             case "remove":
                 tagRemove(event, splitMessage, commandPrefix);
                 break;
