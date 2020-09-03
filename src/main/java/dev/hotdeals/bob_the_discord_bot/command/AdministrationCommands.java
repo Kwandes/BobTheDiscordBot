@@ -60,7 +60,7 @@ public class AdministrationCommands
     @Command(name = "restart", aliases = {"reload", "reset"}, description = "Restarts the bot", structure = "restart")
     public static void restartBot(MessageChannel channel)
     {
-        MessageService.sendEmbedMessage(channel, "The bot will restart now. It might take up to 5 minutes for it to come back online");
+        MessageService.sendEmbedMessage(channel, "The bot will restart now. It might take up to 2 minutes for it to come back online");
         LOGGER.warn("The bot was ordered to restart");
         ReminderCommand.cancelReminderTimer();
         BobTheDiscordBot.getJda().shutdown();
