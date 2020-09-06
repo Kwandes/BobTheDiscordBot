@@ -23,10 +23,11 @@ public class RankCommand
         if (splitMessage.size() == 2)
         {
             String userRank = "User";
-            if (RankRepo.isAdmin(splitMessage.get(1), event.getGuild().getId())) userRank = "Administrator";
-            if (RankRepo.isDeveloper(splitMessage.get(1))) userRank = "Developer";
-            LOGGER.info("User " + splitMessage.get(1) + " is a " + userRank);
-            MessageService.sendEmbedMessage(event.getChannel(), "User " + splitMessage.get(1) + " is a " + userRank);
+            String userId = MessageService.stripMentionSymbols(splitMessage.get(1));
+            if (RankRepo.isAdmin(userId, event.getGuild().getId())) userRank = "Administrator";
+            if (RankRepo.isDeveloper(userId)) userRank = "Developer";
+            LOGGER.info("User " + userId + " is a " + userRank);
+            MessageService.sendEmbedMessage(event.getChannel(), "User " + userId + " is a " + userRank);
             return;
         }
 
