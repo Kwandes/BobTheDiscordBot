@@ -40,11 +40,32 @@ public class MessageTest
         );
     }
 
+    private static Stream<Arguments> stripMentionSymbolsArguments()
+    {
+        return Stream.of(
+                Arguments.of("232921997514899457", "232921997514899457"),
+                Arguments.of("<@!232921997514899457>", "232921997514899457"),
+                Arguments.of("718584675576315956", "718584675576315956"),
+                Arguments.of("<#718584675576315956>", "718584675576315956"),
+                Arguments.of("<@!1>", "1"),
+                Arguments.of("<#1>", "1"),
+                Arguments.of("", "")
+        );
+    }
+
     @ParameterizedTest
     @MethodSource("formatMessageArguments")
     @DisplayName("Format Message Arguments")
     void formatMessageArgumentsTest(String message, int argCount, String[] expectedArray)
     {
         assertEquals(Arrays.toString(expectedArray), MessageService.formatMessageArguments(message, argCount).toString());
+    }
+
+    @ParameterizedTest
+    @MethodSource("stripMentionSymbolsArguments")
+    @DisplayName("Strip mention symbols")
+    void stripMentionSymbolsTest(String id, String expectedId)
+    {
+        assertEquals(expectedId, MessageService.stripMentionSymbols(id));
     }
 }

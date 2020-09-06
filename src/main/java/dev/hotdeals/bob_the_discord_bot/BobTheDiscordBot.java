@@ -158,7 +158,7 @@ public class BobTheDiscordBot
             }
         };
 
-        new Timer("checkBotStatus").schedule(checkBotStatus, TimeUnit.SECONDS.toMillis(60), TimeUnit.MINUTES.toMillis(5));
+        new Timer("checkBotStatus").schedule(checkBotStatus, TimeUnit.SECONDS.toMillis(60), TimeUnit.MINUTES.toMillis(1));
     }
 
     public static Config getConfig()

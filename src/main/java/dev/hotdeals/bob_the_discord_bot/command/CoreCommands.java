@@ -46,7 +46,7 @@ public class CoreCommands extends ListenerAdapter
         {
             case "tag":
             case "t":
-                TagCommands.processTagCommand(event);
+                TagCommands.processTagCommand(event.getMessage().getContentRaw(), commandPrefix, event.getGuild().getId(), event.getChannel());
                 break;
             case "ping":
                 sendPing(event);
@@ -106,8 +106,13 @@ public class CoreCommands extends ListenerAdapter
                     RankCommand.changeRank(event);
                 break;
             case "":
+                break;
             default:
-                // do nothing, such command doesn't exist / is invalid
+                StringBuilder newString = new StringBuilder(event.getMessage().getContentRaw());
+                newString.insert(1, "tag ");
+                TagCommands.processTagCommand(newString.toString(), commandPrefix, event.getGuild().getId(), event.getChannel());
+                break;
+            // do nothing, such command doesn't exist / is invalid
         }
     }
 
