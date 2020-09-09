@@ -150,16 +150,15 @@ public class CoreCommands extends ListenerAdapter
 
     public String getFirstArgument(String message, String commandPrefix, String botId)
     {
-        String firstArg = message.toLowerCase().split(" ")[0];
+        String firstArg = message.split(" ")[0];
         String command = "";
-
         if (firstArg.startsWith(commandPrefix))
             command = firstArg.substring(commandPrefix.length());
         // if the message simply mentions the bot, set the command to trigger !status
         if (firstArg.equals("<@!" + botId + ">"))
             command = "status";
 
-        return command;
+        return command.toLowerCase();
     }
     //endregion
 

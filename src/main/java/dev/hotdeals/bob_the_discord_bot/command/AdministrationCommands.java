@@ -19,7 +19,7 @@ public class AdministrationCommands
     public static void handlePrefix(MessageReceivedEvent event)
     {
         String commandPrefix = CoreCommands.findGuildCommandPrefix(event.getGuild().getId());
-        List<String> splitMessage = MessageService.formatMessageArguments(event.getMessage().getContentRaw(), 3);
+        List<String> splitMessage = MessageService.formatMessageArguments(event.getMessage().getContentRaw(), 2);
 
         if (splitMessage.size() == 1)
         {
@@ -32,7 +32,7 @@ public class AdministrationCommands
             MessageService.sendErrorMessage(event.getChannel(), "New prefix is too long, max characters: 10, provided prefix: " + splitMessage.get(1).length());
         } else
         {
-            changePrefix(event, splitMessage.get(1), commandPrefix);
+            changePrefix(event, splitMessage.get(1).replace(" ", "_"), commandPrefix);
         }
     }
 
