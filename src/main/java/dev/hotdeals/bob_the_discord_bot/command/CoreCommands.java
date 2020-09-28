@@ -105,6 +105,10 @@ public class CoreCommands extends ListenerAdapter
                 if (RankCommand.isAdministrator(event))
                     RankCommand.changeRank(event);
                 break;
+            case "debug":
+                if (RankCommand.isDeveloper(event))
+                    DebugCommand.debugProgram(event.getChannel());
+                break;
             case "":
                 break;
             default:
@@ -319,6 +323,7 @@ public class CoreCommands extends ListenerAdapter
         Class<? extends ReminderCommand> reminderCommand = ReminderCommand.class;
         Class<? extends RankCommand> rankCommand = RankCommand.class;
         Class<? extends MessageCommand> messageCommand = MessageCommand.class;
+        Class<? extends DebugCommand> debugCommand = DebugCommand.class;
 
         List<List<Method>> methods = new ArrayList<>();
 
@@ -328,6 +333,7 @@ public class CoreCommands extends ListenerAdapter
         methods.add(Arrays.asList(reminderCommand.getDeclaredMethods()));
         methods.add(Arrays.asList(rankCommand.getDeclaredMethods()));
         methods.add(Arrays.asList(messageCommand.getDeclaredMethods()));
+        methods.add(Arrays.asList(debugCommand.getDeclaredMethods()));
 
         List<List<Command>> commands = new ArrayList<>();
         for (List<Method> methodList : methods)

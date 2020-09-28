@@ -84,6 +84,7 @@ public class MessageService
             return false;
         }
     }
+
     public static boolean sendPrivateMessage(User user, MessageEmbed embed)
     {
         try
@@ -108,6 +109,27 @@ public class MessageService
         embed.setDescription(message);
         return sendMessage(channel, embed.build());
     }
+
+    public static boolean sendFileMessage(MessageChannel channel, InputStream file, String filename) throws IOException
+    {
+        try
+        {
+            LOGGER.debug("File Message Embed sent to " + channel);
+            channel.sendFile(file, filename).complete();
+            file.close();
+        } catch (ErrorResponseException e)
+        {
+            LOGGER.error("File message has failed to send", e);
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean sendFileMessage(MessageChannel channel, InputStream file) throws IOException
+    {
+        return sendFileMessage(channel, file, "file.txt");
+    }
+
 
     public static void sendBootMessage()
     {
@@ -212,6 +234,7 @@ public class MessageService
 
     /**
      * Removes <!*> and <#*> from IDs
+     *
      * @param id ID to be formatted
      * @return stripped ID
      */
