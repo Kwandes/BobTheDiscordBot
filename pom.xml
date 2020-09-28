@@ -6,7 +6,7 @@
 
     <groupId>dev.hotdeals</groupId>
     <artifactId>bob_the_discord_bot</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.2.0_185</version>
+            <version>4.2.0_205</version>
         </dependency>
 
         <!-- Logging -->
