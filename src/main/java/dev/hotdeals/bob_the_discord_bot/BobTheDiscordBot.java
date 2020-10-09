@@ -11,6 +11,7 @@ import dev.hotdeals.bob_the_discord_bot.config.Config;
 import dev.hotdeals.bob_the_discord_bot.config.JdbcConfig;
 import dev.hotdeals.bob_the_discord_bot.repository.PrefixRepo;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDA.Status;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -21,6 +22,9 @@ import org.apache.logging.log4j.Logger;
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -145,15 +149,42 @@ public class BobTheDiscordBot
             @Override
             public void run()
             {
-                if (jda == null || !jda.getStatus().equals(JDA.Status.CONNECTED))
+                if (jda == null)
                 {
-                    LOGGER.warn("The JDA was null, starting the bot");
+                    LOGGER.warn("The JDA was null, restarting the bot");
+                    LOGGER.info("Collecting thread dump data");
+                    StringBuilder threadDump = new StringBuilder(System.lineSeparator());
+                    ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+                    for (ThreadInfo threadInfo : threadMXBean.dumpAllThreads(true, true))
+                    {
+                        threadDump.append(threadInfo.toString());
+                    }
+                    LOGGER.info(threadDump);
+                    LOGGER.info("Shutting down the bot");
+                    jda.shutdownNow();
+                    LOGGER.info("Starting the bot after the JDA becoming null");
                     runBot();
-                } else if (!jda.getStatus().equals(JDA.Status.CONNECTED))
+                    return;
+                }
+
+                Status jdaStatus = jda.getStatus();
+                switch (jdaStatus)
                 {
-                    LOGGER.warn("The JDA is not connected, status: " + jda.getStatus().toString());
-                    LOGGER.info("Starting the bot");
-                    runBot();
+                    case CONNECTED:
+                        break;
+                    case DISCONNECTED:
+                        LOGGER.warn("The JDA is currently in a disconnected state, restarting");
+                        jda.shutdown();
+                        runBot();
+                        break;
+                    case SHUTDOWN:
+                        LOGGER.warn("The JDA is currently in a shutdown state, restarting");
+                        jda.shutdownNow();
+                        runBot();
+                        break;
+                    default:
+                        LOGGER.info("Current JDA status: " + jdaStatus);
+                        break;
                 }
             }
         };
