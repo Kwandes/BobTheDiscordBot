@@ -9,6 +9,7 @@ import dev.hotdeals.bob_the_discord_bot.command.CoreCommands;
 import dev.hotdeals.bob_the_discord_bot.command.ReminderCommand;
 import dev.hotdeals.bob_the_discord_bot.config.Config;
 import dev.hotdeals.bob_the_discord_bot.config.JdbcConfig;
+import dev.hotdeals.bob_the_discord_bot.listener.GithubBotListener;
 import dev.hotdeals.bob_the_discord_bot.repository.PrefixRepo;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDA.Status;
@@ -99,6 +100,7 @@ public class BobTheDiscordBot
             LOGGER.info("JDA has finished loading and has successfully logged in");
 
             jda.addEventListener(new CoreCommands());
+            jda.addEventListener(new GithubBotListener());
 
             MessageService.sendBootMessage();
         } catch (LoginException e)
