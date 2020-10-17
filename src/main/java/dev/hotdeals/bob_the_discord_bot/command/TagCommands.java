@@ -13,6 +13,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -218,7 +220,9 @@ public class TagCommands
     private static void tagList(String guildId, MessageChannel channel)
     {
         StringBuilder tags = new StringBuilder();
-        for (String tag : TagRepo.fetchTagsForGuild(guildId).keySet())
+        List<String> tagList = new ArrayList<>(TagRepo.fetchTagsForGuild(guildId).keySet());
+        Collections.sort(tagList);
+        for (String tag : tagList)
         {
             tags.append("`").append(tag).append("`, ");
         }
