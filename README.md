@@ -5,7 +5,7 @@
 
 > A simple Discord bot made in Java for learning purposes
 
-###Technologies Used
+### Technologies Used
 - Java 11
 - JDA
 - SLF4j
